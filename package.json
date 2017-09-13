@@ -1,0 +1,55 @@
+{
+  "name": "api-framework",
+  "version": "1.0.0",
+  "description": "APP Framework",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "export NODE_ENV=production && node src/index.js",
+    "dev": "export NODE_ENV=dev && nodemon --watch src src/index.js",
+    "docs": "rm -rf ./docs/* && node ./scripts/docs.js",
+    "schema": "rm -rf ./src/scheams/*.js && npm run lint",
+    "lint": "eslint src config test scripts --fix",
+    "test": "npm run lint && export NODE_ENV=test && mocha test/**/test-*.js",
+    "cover": "export NODE_ENV=test && istanbul cover _mocha test/**/test*.js -- t 60000 && open coverage/lcov-report/index.html",
+    "deploy": "git pull && npm i --registry=https://registry.npm.taobao.org --production && pm2 startOrGracefulReload app.json",
+    "logs": "tail -F ./logs/**/*.log"
+  },
+  "author": "Yourtion <yourtion@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "body-parser": "^1.18.0",
+    "connect-redis": "^3.3.0",
+    "express": "^4.15.3",
+    "express-coroutine": "^1.1.1",
+    "express-session": "^1.15.5",
+    "ioredis": "^3.1.4",
+    "lei-utils": "^3.1.1",
+    "lodash": "^4.17.4",
+    "log4js": "^2.3.3",
+    "mysql": "^2.14.1",
+    "path-to-regexp": "^2.0.0",
+    "squel": "^5.11.1",
+    "validator": "^8.2.0",
+    "xss": "^0.3.4"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "debug": "^3.0.1",
+    "eslint": "^4.6.1",
+    "eslint-config-guo": "^0.5.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.5.0",
+    "mocha-generators": "^2.0.0",
+    "supertest": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://git.yourtion.com/OpenSource/API-Framwork.git"
+  },
+  "bugs": {
+    "url": "https://git.yourtion.com/OpenSource/API-Framwork/issues"
+  },
+  "homepage": "https://git.yourtion.com/OpenSource/API-Framwork#readme"
+}
