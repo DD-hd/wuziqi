@@ -9,7 +9,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const router = new express.Router();
 
-const { log4js, errors, config, pm2 } = require('./global');
+const { log4js, errors, config } = require('./global');
 const { middlewares } = require('./lib');
 const logger = log4js.getLogger();
 

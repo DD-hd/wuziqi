@@ -7,9 +7,9 @@
 
 const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
-const { config, errors, redis, log4js } = require('../global');
+const { config, redis, log4js } = require('../global');
 const logger = log4js.getLogger();
-const xss = require('xss');
+// const xss = require('xss');
 
 exports.session = session({
   store: new RedisStore({
@@ -21,16 +21,16 @@ exports.session = session({
   saveUninitialized: true,
 });
 
-exports.xssFilter = (params) => {
-  return (req, res, next) => {
-    params.forEach((param) => {
-      if (req.$params[param]) {
-        req.$params[param] = xss(req.$params[param]);
-      }
-      next();
-    });
-  };
-};
+// exports.xssFilter = (params) => {
+//   return (req, res, next) => {
+//     params.forEach((param) => {
+//       if (req.$params[param]) {
+//         req.$params[param] = xss(req.$params[param]);
+//       }
+//       next();
+//     });
+//   };
+// };
 
 exports.parsePages = function (req, res, next) {
   const param = req.$params || req.query;

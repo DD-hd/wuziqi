@@ -15,9 +15,8 @@ const base = {
   authCodeMaxAge: 300,
   saltRounds: 10, // 密码加盐长度
   logger_debug: true,
-  redisKey: 'examinaiton',
+  redisKey: 'api',
   debug: true,
-  cartCount: 10, // 购物车可存商品数量
   message: {
     success: '操作成功',
     error: '操作失败',
