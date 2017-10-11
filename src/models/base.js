@@ -33,14 +33,18 @@ function _parseWhere(sql, conditions) {
 
 function errorHandler(err) {
   if (!isNaN(err.code - 0)) throw err;
+  const source = utils.getErrorSourceFromCo(err);
   logger.error({
     code: err.code,
     msg: err.sqlMessage,
     sql: err.sql,
+    source,
   });
   switch (err.code) {
   case 'ER_DUP_ENTRY':
     throw errors.repeatError();
+  case 'ER_ROW_IS_REFERENCED_2':
+    throw errors.dependError();
   default:
     throw errors.dataBaseError();
   }
@@ -59,7 +63,6 @@ class Base {
   constructor(table, options = {}) {
     this.squel = squel;
     this.table = table;
-    this.schema = require(`../schemas/${ table }`);
     this.fields = options.fields || [];
     this.order = options.order;
     this.SELETE_OPT = SELETE_OPT;
@@ -695,6 +698,22 @@ class Base {
     });
   }
 
+  _getAllData(conditions = {}, fields = this.fields, order = this.order, asc = true) {
+    const sql = squel.select(SELETE_OPT).from(this.table);
+    fields.forEach(f => sql.field(f));
+    _parseWhere(sql, conditions);
+    if (order) sql.order(order, asc);
+    return sql;
+  }
+
+  getAllData(conditions = {}, fields = this.fields, order = this.order, asc = true) {
+    const sql = this._getAllData(conditions, fields, order, asc);
+    return co(function* () {
+      logger.debug('Get AllData');
+      const connection = yield mysql.getConnectionAsync();
+      return { connection, sql };
+    });
+  }
 }
 
 module.exports = Base;

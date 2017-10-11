@@ -18,6 +18,7 @@ const errorInfo = {
   'RepeatError': { code: -1007, desc: '该记录已经存在', show: true, log: false },
   'CartFullError': { code: -1008, desc: '购物车已经满了', show: true, log: false },
   'ExceInvalidError': { code: -1009, desc: '不合法执行', show: true, log: false },
+  'DependError': { code: -1010, desc: '数据存在依赖', show: true, log: false },
 };
 
 assert(new Set(Object.keys(errorInfo).map(k => errorInfo[k].code)).size === Object.keys(errorInfo).length, 'Error code 必须唯一');
@@ -71,4 +72,7 @@ exports.cartFullError = (value) => {
 };
 exports.exceInvalidError = (value) => {
   return error('ExceInvalidError', value);
+};
+exports.dependError = (value) => {
+  return error('DependError', value);
 };

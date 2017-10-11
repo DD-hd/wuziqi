@@ -103,3 +103,20 @@ exports.mergeInfo = (array, object, k1, k2, prefix) => {
   return array;
 };
 
+/**
+ * 获取 coroutine 中错误堆栈
+ * @param {Error} err 错误
+ * @param {String} base 默认文件路径
+ * @return {Array}
+ */
+exports.getErrorSourceFromCo = (err, base = '/src/') => {
+  const reaseon = [];
+  if(err.stack) {
+    for(const line of err.stack.split('\n')) {
+      if(line.indexOf(base) !== -1) {
+        reaseon.push(line.trim().replace('at ', ''));
+      }
+    }
+  }
+  return reaseon;
+};

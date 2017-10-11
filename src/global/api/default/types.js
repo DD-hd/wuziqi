@@ -197,4 +197,5 @@ module.exports = function defaultTypes(type) {
     description: '可为null整数',
     isDefault: true,
   });
+
 };

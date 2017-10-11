@@ -18,7 +18,7 @@ const debug = require('./debug').params;
 function apiCheckParams(ctx, schema) {
   return (req, res, next) => {
     const newParams = {};
-    for(const place of [ 'body', 'query', 'params' ]) {
+    for(const place of [ 'query', 'params', 'body' ]) {
       const pOptions = schema.options[place];
       for(const name in pOptions) {
 
