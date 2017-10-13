@@ -69,6 +69,10 @@ module.exports = class API {
     this.api.formatOutputReverse = fn;
   }
 
+  setDocOutputForamt(fn) {
+    this.api.docOutputForamt = fn;
+  }
+
   _register() {
     /**
      * 注册API

@@ -34,6 +34,7 @@ module.exports = function extendDocs() {
       schemas: {},
       group: this.groups,
     };
+    const formatOutput = this.api.docOutputForamt || function (out) { return out; };
     
     Object.keys(this.api.$schemas).forEach(k => {
       const schema = this.api.$schemas[k];
@@ -52,20 +53,6 @@ module.exports = function extendDocs() {
       t.formatter = t.formatter && t.formatter.toString();
       data.types[t.name] = t;
     });
-
-    // this.api.getOption('formatOutput');
-    const formatOutput = (out) => {
-      const result = out && out.success && out.result;
-      if(Array.isArray(out.result) && out.result.length > 2) {
-        out.result = out.result.slice(0, 2);
-      }
-      [ 'list', 'subjects', 'contents', 'examinations' ].forEach(li => {
-        if(Array.isArray(result[li]) && result[li].length > 2) {
-          result[li] = result[li].slice(0, 2);
-        }
-      });
-      return out;
-    };
 
     for (const s in data.schemas) {
       // 格式化输出结果

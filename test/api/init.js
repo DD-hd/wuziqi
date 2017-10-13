@@ -14,8 +14,21 @@ function format(data) {
   }
   return [ data.msg || data.message, null];
 }
-
 apiService.setFormatOutput(format);
+
+function docOutputForamt(out) {
+  const result = out && out.success && out.result;
+  if(Array.isArray(out.result) && out.result.length > 2) {
+    out.result = out.result.slice(0, 2);
+  }
+  [ 'list' ].forEach(li => {
+    if(Array.isArray(result[li]) && result[li].length > 2) {
+      result[li] = result[li].slice(0, 2);
+    }
+  });
+  return out;
+}
+apiService.setDocOutputForamt(docOutputForamt);
 
 function init() {
   require('mocha-generators').install();
