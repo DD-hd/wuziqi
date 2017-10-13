@@ -101,10 +101,17 @@ function typeDocs(data) {
   });
   
   const list = [];
-  list.push(`# 数据类型\n`);
+  list.push(`## 默认数据类型\n`);
   list.push(`类型 | 描述 | 检查 | 格式化 | 解析`);
   list.push(`------|----- |-----|-----|-----`);
   for (const item of defaultTypes) {
+    list.push(`\`${ item.name }\` | ${ stringOrEmpty(item.description) } | ${ itemTF(item.checker) } ` +
+        `| ${ itemTF(item.formatter) } | ${ itemTF(item.parser) }`.trim());
+  }
+  list.push(`\n## 自定义数据类型\n`);
+  list.push(`类型 | 描述 | 检查 | 格式化 | 解析`);
+  list.push(`------|----- |-----|-----|-----`);
+  for (const item of customTypes) {
     list.push(`\`${ item.name }\` | ${ stringOrEmpty(item.description) } | ${ itemTF(item.checker) } ` +
         `| ${ itemTF(item.formatter) } | ${ itemTF(item.parser) }`.trim());
   }
