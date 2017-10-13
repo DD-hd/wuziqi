@@ -107,11 +107,12 @@ module.exports = class API {
       debug('bind router' + key);
       const schema = this.api.$schemas[key];
       schema.init(this);
-      router[schema.options.method].bind(router)(schema.options.path, paramChecker(this, schema));
-      for(const midleware of schema.options.middlewares) {
-        router[schema.options.method].bind(router)(schema.options.path, midleware);
-      }
-      router[schema.options.method].bind(router)(schema.options.path, schema.options.handler);
+      router[schema.options.method].bind(router)(
+        schema.options.path,
+        paramChecker(this, schema),
+        ...schema.options.middlewares,
+        schema.options.handler
+      );
     }
   }
 
