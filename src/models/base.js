@@ -9,43 +9,64 @@ const logger = log4js.getLogger('mysql');
 
 const SELETE_OPT = { autoQuoteTableNames: true, autoQuoteFieldNames: true };
 
+/**
+ * 删除对象中的 undefined
+ * 
+ * @param {Object} object 
+ * @returns {Object}
+ */
 function removeUndefined(object) {
   Object.keys(object).forEach(key => object[key] === undefined && delete object[key]);
   if (Object.keys.length === 0) throw errors.dataBaseError('Object is empty');
   return object;
 }
 
+/**
+ * 解析 Where
+ * 
+ * @param {Object} sql Squel 对象
+ * @param {Object} conditions 查询条件
+ */
 function _parseWhere(sql, conditions) {
   Object.keys(conditions).forEach(k => {
     if (k.indexOf('$') === 0) {
+      // 以 $ 开头直接解析
       if (Array.isArray(conditions[k])) {
         sql.where(...conditions[k]);
       } else {
         sql.where(conditions[k]);
       }
     } else if (_.isArray(conditions[k])) {
+      // 数组类型使用 in 方式
       sql.where(`${ k } in ?`, conditions[k]);
     } else {
+      // 使用查询条件解析
       sql.where(`${ k } = ?`, conditions[k]);
     }
   });
 }
 
+/**
+ * 数据库错误处理
+ * 
+ * @param {Error} err 错误
+ */
 function errorHandler(err) {
+  // 如果是自定义错误直接抛出
   if (!isNaN(err.code - 0)) throw err;
+  // 获取源文件堆栈信息
   const source = utils.getErrorSourceFromCo(err);
-  logger.error({
-    code: err.code,
-    msg: err.sqlMessage,
-    sql: err.sql,
-    source,
-  });
+  // 判断条件
   switch (err.code) {
   case 'ER_DUP_ENTRY':
     throw errors.repeatError();
-  case 'ER_ROW_IS_REFERENCED_2':
-    throw errors.dependError();
   default:
+    logger.error({
+      code: err.code,
+      msg: err.sqlMessage,
+      sql: err.sql,
+      source,
+    });
     throw errors.dataBaseError();
   }
 }
@@ -53,13 +74,13 @@ function errorHandler(err) {
 class Base {
 
   /**
-     * Creates an instance of Base.
-     * @param {String} table 表名
-     * @param {Object} [options={}] 
-     *   - {Object} fields 默认列
-     *   - {Object} order 默认排序字段
-     * @memberof Base
-     */
+   * Creates an instance of Base.
+   * @param {String} table 表名
+   * @param {Object} [options={}] 
+   *   - {Object} fields 默认列
+   *   - {Object} order 默认排序字段
+   * @memberof Base
+   */
   constructor(table, options = {}) {
     this.squel = squel;
     this.table = table;
@@ -70,12 +91,12 @@ class Base {
   }
 
   /**
-     * 输出 SQL Debug
-     * 
-     * @param {String} name Debug 前缀
-     * @returns {String} SQL 
-     * @memberof Base
-     */
+   * 输出 SQL Debug
+   * 
+   * @param {String} name Debug 前缀
+   * @returns {String} SQL 
+   * @memberof Base
+   */
   debugSQL(name) {
     return (sql) => {
       logger.debug(` ${ name } : ${ sql }`);
@@ -84,13 +105,13 @@ class Base {
   }
 
   /**
-     * 查询方法（内部查询尽可能调用这个，会打印Log）
-     * 
-     * @param {String} sql SQL字符串
-     * @param {Object} [connection=mysql] Mysql连接，默认为pool
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 查询方法（内部查询尽可能调用这个，会打印Log）
+   * 
+   * @param {String} sql SQL字符串
+   * @param {Object} [connection=mysql] Mysql连接，默认为pool
+   * @returns {Promise}
+   * @memberof Base
+   */
   query(sql, connection = mysql) {
     logger.debug(sql);
     return connection.queryAsync(sql).catch(err => {
@@ -105,12 +126,12 @@ class Base {
   }
 
   /**
-     * 计算数据表 count
-     * 
-     * @param {Object} [conditions={}] 条件
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 计算数据表 count
+   * 
+   * @param {Object} [conditions={}] 条件
+   * @returns {Promise}
+   * @memberof Base
+   */
   count(conditions = {}) {
     const that = this;
     return co(function* () {
@@ -127,13 +148,13 @@ class Base {
   }
 
   /**
-     * 根据 ID 获取数据
-     * 
-     * @param {Number} id 主键ID
-     * @param {Array} [fields=this.fields] 所需要的列数组
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 根据 ID 获取数据
+   * 
+   * @param {Number} id 主键ID
+   * @param {Array} [fields=this.fields] 所需要的列数组
+   * @returns {Promise}
+   * @memberof Base
+   */
   getById(id, fields = this.fields) {
     const that = this;
     return co(function* () {
@@ -150,13 +171,13 @@ class Base {
   }
 
   /**
-     * 根据查询条件获取一条记录
-     * 
-     * @param {Object} [object={}] 字段、值对象
-     * @param {Array} [fields=this.fields] 所需要的列数组
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 根据查询条件获取一条记录
+   * 
+   * @param {Object} [object={}] 字段、值对象
+   * @param {Array} [fields=this.fields] 所需要的列数组
+   * @returns {Promise}
+   * @memberof Base
+   */
   getOneByField(object = {}, fields = this.fields) {
     const that = this;
     return co(function* () {
@@ -171,13 +192,13 @@ class Base {
   }
 
   /**
-     * 根据 ID 删除数据
-     * 
-     * @param {Number} id 主键ID
-     * @param {Number} [limit=1] 删除条数
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 根据 ID 删除数据
+   * 
+   * @param {Number} id 主键ID
+   * @param {Number} [limit=1] 删除条数
+   * @returns {Promise}
+   * @memberof Base
+   */
   deleteById(id, limit = 1) {
     return this.query(this._deleteById(id, limit).toString());
   }
@@ -189,25 +210,25 @@ class Base {
   }
 
   /**
-     * 根据查询条件删除数据
-     * 
-     * @param {Object} [object={}] 字段、值对象
-     * @param {Number} [limit=1] 删除条数
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 根据查询条件删除数据
+   * 
+   * @param {Object} [object={}] 字段、值对象
+   * @param {Number} [limit=1] 删除条数
+   * @returns {Promise}
+   * @memberof Base
+   */
   deleteByField(key, limit = 1) {
     return this.query(this._deleteByField(key, limit).toString());
   }
 
   /**
-     * 根据查询条件获取记录
-     * 
-     * @param {Object} [object={}] 字段、值对象
-     * @param {Array} [fields=this.fields] 所需要的列数组
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 根据查询条件获取记录
+   * 
+   * @param {Object} [object={}] 字段、值对象
+   * @param {Array} [fields=this.fields] 所需要的列数组
+   * @returns {Promise}
+   * @memberof Base
+   */
   getByField(where = {}, fields = this.fields) {
     return this.list(where, fields, 999);
   }
@@ -218,12 +239,12 @@ class Base {
   }
 
   /**
-     * 插入一条数据
-     * 
-     * @param {Object} [object={}] 插入的数据对象
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 插入一条数据
+   * 
+   * @param {Object} [object={}] 插入的数据对象
+   * @returns {Promise}
+   * @memberof Base
+   */
   insert(object = {}) {
     return this.query(this._insert(object).toString());
   }
@@ -234,12 +255,12 @@ class Base {
   }
 
   /**
-     * 批量插入数据
-     * 
-     * @param {Array<Object>} array 插入的数据对象数组
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 批量插入数据
+   * 
+   * @param {Array<Object>} array 插入的数据对象数组
+   * @returns {Promise}
+   * @memberof Base
+   */
   batchInsert(array) {
     return this.query(this._batchInsert(array).toString());
   }
@@ -263,13 +284,13 @@ class Base {
   }
 
   /**
-     * 根据 ID 更新记录
-     * 
-     * @param {Number} id 主键ID
-     * @param {Object} fields 更新的内容对象
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 根据 ID 更新记录
+   * 
+   * @param {Number} id 主键ID
+   * @param {Object} fields 更新的内容对象
+   * @returns {Promise}
+   * @memberof Base
+   */
   updateById(id, fields, raw = false) {
     const that = this;
     return co(function* () {
@@ -299,13 +320,13 @@ class Base {
   }
 
   /**
-     * 创建一条记录，如果存在就更新
-     * 
-     * @param {Object} fields 创建记录对象
-     * @param {Array} update 更新字段
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 创建一条记录，如果存在就更新
+   * 
+   * @param {Object} fields 创建记录对象
+   * @param {Array} update 更新字段
+   * @returns {Promise}
+   * @memberof Base
+   */
   createOrUpdate(fields, update) {
     const that = this;
     return co(function* () {
@@ -334,13 +355,13 @@ class Base {
   }
 
   /**
-     * 根据查询条件更新记录
-     * 
-     * @param {Object} key 查询条件对象
-     * @param {Object} fields 更新的内容对象
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 根据查询条件更新记录
+   * 
+   * @param {Object} key 查询条件对象
+   * @param {Object} fields 更新的内容对象
+   * @returns {Promise}
+   * @memberof Base
+   */
   updateByField(key, fields) {
     const that = this;
     return co(function* () {
@@ -357,13 +378,13 @@ class Base {
   }
 
   /**
-     * 根据ID对数据列执行加一操作
-     * 
-     * @param {Number} id 主键ID
-     * @param {Array} fields 需要更新的列数组
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 根据ID对数据列执行加一操作
+   * 
+   * @param {Number} id 主键ID
+   * @param {Array} fields 需要更新的列数组
+   * @returns {Promise}
+   * @memberof Base
+   */
   incrFields(id, fields, num = 1) {
     return this.query(this._incrFields(id, fields, num).toString());
   }
@@ -378,17 +399,17 @@ class Base {
   }
 
   /**
-     * 根据条件获取列表
-     * 
-     * @param {Object} [conditions={}] 查询条件对象
-     * @param {Array} [fields=this.fields] 需要查询的字段
-     * @param {Number} [limit=999] 限制条数
-     * @param {Number} [offset=0] 跳过数量
-     * @param {String} [order=this.order] 排序字段
-     * @param {Boolean} [asc=true] 是否正向排序
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 根据条件获取列表
+   * 
+   * @param {Object} [conditions={}] 查询条件对象
+   * @param {Array} [fields=this.fields] 需要查询的字段
+   * @param {Number} [limit=999] 限制条数
+   * @param {Number} [offset=0] 跳过数量
+   * @param {String} [order=this.order] 排序字段
+   * @param {Boolean} [asc=true] 是否正向排序
+   * @returns {Promise}
+   * @memberof Base
+   */
   list(conditions = {}, fields = this.fields, limit = 999, offset = 0, order = this.order, asc = true) {
     return this.query(this._list(conditions, fields, limit, offset, order, asc).toString());
   }
@@ -408,33 +429,33 @@ class Base {
   }
 
   /**
-     * 根据关键词进行搜索
-     * 
-     * @param {String} keyword 关键词
-     * @param {Array} search 搜索字段
-     * @param {Array} [fields=this.fields] 需要查询的字段
-     * @param {number} [limit=10] 限制条数
-     * @param {any} [order=this.order] 排序字段
-     * @param {boolean} [asc=true] 是否正向排序
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 根据关键词进行搜索
+   * 
+   * @param {String} keyword 关键词
+   * @param {Array} search 搜索字段
+   * @param {Array} [fields=this.fields] 需要查询的字段
+   * @param {number} [limit=10] 限制条数
+   * @param {any} [order=this.order] 排序字段
+   * @param {boolean} [asc=true] 是否正向排序
+   * @returns {Promise}
+   * @memberof Base
+   */
   search(keyword, search, fields = this.fields, limit = 10, order = this.order, asc = true) {
     return this.query(this._search(keyword, search, fields, limit, order, asc).toString());
   }
 
   /**
-     * 根据条件获取分页内容（比列表多处总数计算）
-     * 
-     * @param {Object} [conditions={}] 查询条件对象
-     * @param {Array} [fields=this.fields] 需要查询的字段
-     * @param {Number} [limit=999] 限制条数
-     * @param {Number} [offset=0] 跳过数量
-     * @param {String} [order=this.order] 排序字段
-     * @param {Boolean} [asc=true] 是否正向排序
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 根据条件获取分页内容（比列表多处总数计算）
+   * 
+   * @param {Object} [conditions={}] 查询条件对象
+   * @param {Array} [fields=this.fields] 需要查询的字段
+   * @param {Number} [limit=999] 限制条数
+   * @param {Number} [offset=0] 跳过数量
+   * @param {String} [order=this.order] 排序字段
+   * @param {Boolean} [asc=true] 是否正向排序
+   * @returns {Promise}
+   * @memberof Base
+   */
   page(conditions = {}, fields = this.fields, limit = 30, offset = 0, order = this.order, asc = true) {
     const that = this;
     return co(function* () {
@@ -445,12 +466,12 @@ class Base {
   }
 
   /**
-     * 执行事务（通过传人方法）
-     * 
-     * @param {String} name 
-     * @param {Function} func 
-     * @memberof Base
-     */
+   * 执行事务（通过传人方法）
+   * 
+   * @param {String} name 
+   * @param {Function} func 
+   * @memberof Base
+   */
   transactions(name, func) {
     const that = this;
     return co(function* () {
@@ -483,12 +504,12 @@ class Base {
   }
 
   /**
-     * 执行事务（通过传人SQL语句数组）
-     * 
-     * @param {Array<String>} sqls SQL语言数组
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 执行事务（通过传人SQL语句数组）
+   * 
+   * @param {Array<String>} sqls SQL语言数组
+   * @returns {Promise}
+   * @memberof Base
+   */
   transactionSQLs(sqls) {
     return co(function* () {
       if (!sqls || sqls.length < 1) throw errors.dataBaseError('`sqls` 不能为空');
@@ -514,15 +535,15 @@ class Base {
   }
 
   /**
-     * 拼凑查询列表的sql语句
-     * @param {Object}  condition 
-     * @param {Object}  condition.where 查询限制条件
-     * @param {Squel}   condition.squel sql拼凑对象
-     * @param {Number}  condition.offset 开始下标
-     * @param {Number}  condition.limit 查询条数
-     * @param {Number}  condition.order 排序字段
-     * @param {Number}  condition.asc  是否增序
-     */
+   * 拼凑查询列表的sql语句
+   * @param {Object}  condition 
+   * @param {Object}  condition.where 查询限制条件
+   * @param {Squel}   condition.squel sql拼凑对象
+   * @param {Number}  condition.offset 开始下标
+   * @param {Number}  condition.limit 查询条数
+   * @param {Number}  condition.order 排序字段
+   * @param {Number}  condition.asc  是否增序
+   */
   _listSql(condition = {}) {
 
     const { squel, where = {}, offset, limit, order, asc } = condition;
@@ -534,11 +555,11 @@ class Base {
   }
 
   /**
-     * 拼凑查询总数的sql语句
-     * @param {Object}  condition 
-     * @param {Object}  condition.where 查询限制条件
-     * @param {Squel}   condition.squel sql拼凑对象
-     */
+   * 拼凑查询总数的sql语句
+   * @param {Object}  condition 
+   * @param {Object}  condition.where 查询限制条件
+   * @param {Squel}   condition.squel sql拼凑对象
+   */
   _countSql(condition = {}) {
     const { squel, where } = condition;
     const sql = squel.field('COUNT(*)', 'c');
@@ -547,17 +568,17 @@ class Base {
   }
 
   /**
-     * 生成join查询列表的函数
-     * @param {Object}  table 表相关信息
-     * @param {Object}  table.pri 主表
-     * @param {Object}  table.foreign 副表
-     * @param {String}  table.pri.table 主表名字
-     * @param {String}  table.pri.key 主表链接key
-     * @param {Array}   table.pri.fields 主表字段
-     * @param {String}  table.foreign.table 主表名字
-     * @param {String}  table.foreign.key 主表链接key
-     * @param {Array}   table.foreign.fields 主表字段
-     */
+   * 生成join查询列表的函数
+   * @param {Object}  table 表相关信息
+   * @param {Object}  table.pri 主表
+   * @param {Object}  table.foreign 副表
+   * @param {String}  table.pri.table 主表名字
+   * @param {String}  table.pri.key 主表链接key
+   * @param {Array}   table.pri.fields 主表字段
+   * @param {String}  table.foreign.table 主表名字
+   * @param {String}  table.foreign.key 主表链接key
+   * @param {Array}   table.foreign.fields 主表字段
+   */
   _makeJoinList(table = { pri: {}, foreign: {}}) {
     const { pri, foreign } = table;
     return (conditions) => {
@@ -613,15 +634,16 @@ class Base {
   }
 
   /**
-     * 生成join查询列表的总数函数
-     * @param {Object}  table 表相关信息
-     * @param {Object}  table.pri 主表
-     * @param {Object}  table.foreign 副表
-     * @param {String}  table.pri.table 主表名字
-     * @param {String}  table.pri.key 主表链接key
-     * @param {String}  table.foreign.table 主表名字
-     * @param {String}  table.foreign.key 主表链接key
-     */
+   * 生成join查询列表的总数函数
+   * 
+   * @param {Object}  table 表相关信息
+   * @param {Object}  table.pri 主表
+   * @param {Object}  table.foreign 副表
+   * @param {String}  table.pri.table 主表名字
+   * @param {String}  table.pri.key 主表链接key
+   * @param {String}  table.foreign.table 主表名字
+   * @param {String}  table.foreign.key 主表链接key
+   */
   _makeJoinCount(table = { pri: {}, foreign: {}}) {
     const that = this;
     const { pri, foreign } = table;
@@ -631,7 +653,11 @@ class Base {
         const { table: priTable, key: priKey } = pri;
         const { table: foreignTable, key: foreignKey } = foreign;
         const newWhere = _.transform(where, (result, value, key) => {
-          result['a.' + key] = value;
+          if (key.indexOf('$') === -1) {
+            result['a.' + key] = value;
+          } else {
+            result[key] = value;
+          }
         });
         let sql = that.squel.select().from(priTable, 'a');
         if (leftJoin) {
@@ -650,17 +676,18 @@ class Base {
   }
 
   /**
-     * 生成join查询列表的函数
-     * @param {Object}  table 表相关信息
-     * @param {Object}  table.pri 主表
-     * @param {Object}  table.foreign 副表
-     * @param {String}  table.pri.table 主表名字
-     * @param {String}  table.pri.key 主表链接key
-     * @param {Array}   table.pri.fields 主表字段
-     * @param {String}  table.foreign.table 主表名字
-     * @param {String}  table.foreign.key 主表链接key
-     * @param {Array}   table.foreign.fields 主表字段
-     */
+   * 生成join查询列表的函数
+   * 
+   * @param {Object}  table 表相关信息
+   * @param {Object}  table.pri 主表
+   * @param {Object}  table.foreign 副表
+   * @param {String}  table.pri.table 主表名字
+   * @param {String}  table.pri.key 主表链接key
+   * @param {Array}   table.pri.fields 主表字段
+   * @param {String}  table.foreign.table 主表名字
+   * @param {String}  table.foreign.key 主表链接key
+   * @param {Array}   table.foreign.fields 主表字段
+   */
   _makeJoinPage(table = { pri: {}, foreign: {}}) {
     const selectList = this._makeJoinList(table);
     const selectCount = this._makeJoinCount(table);
@@ -674,24 +701,23 @@ class Base {
   }
 
   /**
-     * 
-     * 获取统计信息通用方法
-     * 
-     * @param {String} start 开始时间
-     * @param {String} end 结束时间
-     * @returns {Promise}
-     * @memberof Base
-     */
+   * 获取统计信息通用方法
+   * 
+   * @param {String} start 开始时间
+   * @param {String} end 结束时间
+   * @returns {Promise}
+   * @memberof Base
+   */
   getStatistics(start, end) {
     const that = this;
     return co(function* () {
       const table = squel.select().from(that.table);
       const sql0 = table.clone().field('count(id)', 'total').field(table.clone().field('count(id)').where('date(created_at) = curdate()'), 'today');
       const [ status ] = yield that.query(sql0.toString());
-      const sql = table.clone().where('created_at >= ?', start).where('created_at <= ?', end).order('day', false);
+      const sql = table.clone().where('created_at >= ?', start + ' 00:00:00').where('created_at <= ?', end + ' 23:59:59').order('day', false);
       sql.field('count(id)', 'day_count');
       sql.field('date(created_at)', 'day');
-      sql.field(table.clone().field('count(id)').where('created_at <= day'), 'day_total');
+      sql.field(table.clone().field('count(id)').where('created_at <= DATE_ADD(`day`, INTERVAL 1 DAY) '), 'day_total');
       sql.group('date(created_at)');
       const list = yield that.query(sql.toString());
       return { status, list };
@@ -706,6 +732,16 @@ class Base {
     return sql;
   }
 
+  /**
+   * 异步获取所有数据，按行返回
+   * 
+   * @param {any} [conditions={}] 查询条件
+   * @param {any} [fields=this.fields] 查询字段 
+   * @param {any} [order=this.order] 排序字段
+   * @param {boolean} [asc=true] 是的正向排序
+   * @returns {Promise}
+   * @memberof Base
+   */
   getAllData(conditions = {}, fields = this.fields, order = this.order, asc = true) {
     const sql = this._getAllData(conditions, fields, order, asc);
     return co(function* () {
