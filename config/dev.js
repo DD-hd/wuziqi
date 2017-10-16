@@ -36,6 +36,10 @@ module.exports = {
     password: '3b4a45400e3cac65f3ac96725a536e4f',
     tls: true,
   },
+  kdn: {
+    id: 1299914,
+    key: 'a1363d63-8e92-4af9-afda-58b597d88e7d',
+  },
   qiniu: {
     key: 'dasdadsd',
     secret: 'dsadadad',
