@@ -28,6 +28,14 @@ module.exports = {
     templateFail: 'xxx',
     templateMsg: 'xxxx',
   },
+  smtp: {
+    name: 'Yourtion Guo',
+    host: 'smtp.mailgun.org',
+    port: 465,
+    user: 'postmaster@git.yourtion.com',
+    password: '3b4a45400e3cac65f3ac96725a536e4f',
+    tls: true,
+  },
   qiniu: {
     key: 'dasdadsd',
     secret: 'dsadadad',
