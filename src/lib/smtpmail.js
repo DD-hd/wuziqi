@@ -1,7 +1,7 @@
 'use strict';
 
 const nodemailer = require('nodemailer');
-const { log4js, config, redis, coroutine, errors, utils } = require('../global');
+const { log4js, config } = require('../global');
 const logger = log4js.getLogger();
 const conf = config.smtp;
 
