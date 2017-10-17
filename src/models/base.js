@@ -84,6 +84,7 @@ class Base {
   constructor(table, options = {}) {
     this.squel = squel;
     this.table = table;
+    this.primaryKey = options.primaryKey || 'id';
     this.fields = options.fields || [];
     this.order = options.order;
     this.SELETE_OPT = SELETE_OPT;
@@ -140,9 +141,9 @@ class Base {
     });
   }
 
-  _getById(id, fields) {
-    if (id === undefined) throw errors.dataBaseError('`id` 不能为空');
-    const sql = squel.select(SELETE_OPT).from(this.table).where('id = ?', id).limit(1);
+  _getByPrimary(primary, fields) {
+    if (primary === undefined) throw errors.dataBaseError('`primary` 不能为空');
+    const sql = squel.select(SELETE_OPT).from(this.table).where(this.primaryKey + ' = ?', primary).limit(1);
     fields.forEach(f => sql.field(f));
     return sql;
   }
@@ -150,18 +151,19 @@ class Base {
   /**
    * 根据 ID 获取数据
    * 
-   * @param {Number} id 主键ID
+   * @param {Number} primary 主键
    * @param {Array} [fields=this.fields] 所需要的列数组
    * @returns {Promise}
    * @memberof Base
    */
-  getById(id, fields = this.fields) {
+  getByPrimary(primary, fields = this.fields) {
     const that = this;
     return co(function* () {
-      const res = yield that.query(that._getById(id, fields).toString());
+      const res = yield that.query(that._getByPrimary(primary, fields).toString());
       return res && res[0];
     });
   }
+  getById(id, fields = this.fields) { return this.getByPrimary(id, fields); }
 
   _getOneByField(object = {}, fields = this.fields) {
     const sql = squel.select(SELETE_OPT).from(this.table).limit(1);
@@ -186,22 +188,23 @@ class Base {
     });
   }
 
-  _deleteById(id, limit = 1) {
-    if (id === undefined) throw errors.dataBaseError('`id` 不能为空');
-    return squel.delete().from(this.table).where('id = ?', id).limit(limit);
+  _deleteByPrimary(primary, limit = 1) {
+    if (primary === undefined) throw errors.dataBaseError('`primary` 不能为空');
+    return squel.delete().from(this.table).where(this.primaryKey + ' = ?', primary).limit(limit);
   }
 
   /**
-   * 根据 ID 删除数据
+   * 根据主键删除数据
    * 
-   * @param {Number} id 主键ID
+   * @param {Number} primary 主键
    * @param {Number} [limit=1] 删除条数
    * @returns {Promise}
    * @memberof Base
    */
-  deleteById(id, limit = 1) {
-    return this.query(this._deleteById(id, limit).toString());
+  deleteByPrimary(primary, limit = 1) {
+    return this.query(this._deleteByPrimary(primary, limit).toString());
   }
+  deleteById(id, limit = 1) { return this.deleteByPrimary(id, limit); }
 
   _deleteByField(key, limit = 1) {
     const sql = squel.delete().from(this.table).limit(limit);
@@ -265,10 +268,10 @@ class Base {
     return this.query(this._batchInsert(array).toString());
   }
 
-  _updateById(id, fields, raw = false) {
-    if (id === undefined) throw errors.dataBaseError('`id` 不能为空');
+  _updateByPrimary(primary, fields, raw = false) {
+    if (primary === undefined) throw errors.dataBaseError('`primary` 不能为空');
     removeUndefined(fields);
-    const sql = squel.update().table(this.table).where('id = ?', id);
+    const sql = squel.update().table(this.table).where(this.primaryKey + ' = ?', primary);
     if (raw) {
       Object.keys(fields).forEach(k => {
         if (k.indexOf('$') === 0) {
@@ -284,20 +287,22 @@ class Base {
   }
 
   /**
-   * 根据 ID 更新记录
+   * 根据主键更新记录
    * 
-   * @param {Number} id 主键ID
+   * @param {Number} primary 主键
    * @param {Object} fields 更新的内容对象
+   * @param {Boolean} raw 是否解析 field 对象
    * @returns {Promise}
    * @memberof Base
    */
-  updateById(id, fields, raw = false) {
+  updateByPrimary(primary, fields, raw = false) {
     const that = this;
     return co(function* () {
-      const res = yield that.query(that._updateById(id, fields, raw).toString());
+      const res = yield that.query(that._updateByPrimary(primary, fields, raw).toString());
       return res && res.changedRows === 1;
     });
   }
+  updateById(id, fields, raw = false) { return this.updateByPrimary(id, fields, raw); }
 
   _createOrUpdate(fields, update, raw = false) {
     removeUndefined(fields);
@@ -370,23 +375,23 @@ class Base {
     });
   }
 
-  _incrFields(id, fields, num = 1) {
-    if (id === undefined) throw errors.dataBaseError('`id` 不能为空');
-    const sql = squel.update().table(this.table).where('id = ?', id);
+  _incrFields(primary, fields, num = 1) {
+    if (primary === undefined) throw errors.dataBaseError('`primary` 不能为空');
+    const sql = squel.update().table(this.table).where(this.primaryKey + ' = ?', primary);
     fields.forEach(f => sql.set(`${ f } = ${ f } + ${ num }`));
     return sql;
   }
 
   /**
-   * 根据ID对数据列执行加一操作
+   * 根据主键对数据列执行加一操作
    * 
-   * @param {Number} id 主键ID
+   * @param {Number} primary 主键
    * @param {Array} fields 需要更新的列数组
    * @returns {Promise}
    * @memberof Base
    */
-  incrFields(id, fields, num = 1) {
-    return this.query(this._incrFields(id, fields, num).toString());
+  incrFields(primary, fields, num = 1) {
+    return this.query(this._incrFields(primary, fields, num).toString());
   }
 
   _list(conditions = {}, fields = this.fields, limit = 999, offset = 0, order = this.order, asc = true) {
@@ -545,7 +550,6 @@ class Base {
    * @param {Number}  condition.asc  是否增序
    */
   _listSql(condition = {}) {
-
     const { squel, where = {}, offset, limit, order, asc } = condition;
 
     const sql = squel.offset(offset).limit(limit);
@@ -593,10 +597,8 @@ class Base {
       } = conditions;
       const { table: priTable, key: priKey, fields: priFields } = pri;
       const { table: foreignTable, key: foreignKey, fields: foreignFields } = foreign;
-      // console.log(priFields, foreignFields, priFields.map(item => _.isArray(item) ? [ `a.${ item[0] }`, item[1] ] : `a.${ item }`));
       const fields = _.concat(
         priFields.map(item => {
-          // console.log(decorate)
           if (_.isArray(item)) {
             const decorate = item[0].split('$$');
             return decorate.length > 1 ? [ `${ decorate[0] }(a.${ decorate[1] })`, item[1] ] : [ `${ item[0] }`, item[1] ];
@@ -712,12 +714,12 @@ class Base {
     const that = this;
     return co(function* () {
       const table = squel.select().from(that.table);
-      const sql0 = table.clone().field('count(id)', 'total').field(table.clone().field('count(id)').where('date(created_at) = curdate()'), 'today');
+      const sql0 = table.clone().field(`count(${ this.primaryKey })`, 'total').field(table.clone().field(`count(${ this.primaryKey })`).where('date(created_at) = curdate()'), 'today');
       const [ status ] = yield that.query(sql0.toString());
       const sql = table.clone().where('created_at >= ?', start + ' 00:00:00').where('created_at <= ?', end + ' 23:59:59').order('day', false);
-      sql.field('count(id)', 'day_count');
+      sql.field(`count(${ this.primaryKey })`, 'day_count');
       sql.field('date(created_at)', 'day');
-      sql.field(table.clone().field('count(id)').where('created_at <= DATE_ADD(`day`, INTERVAL 1 DAY) '), 'day_total');
+      sql.field(table.clone().field(`count(${ this.primaryKey })`).where('created_at <= DATE_ADD(`day`, INTERVAL 1 DAY) '), 'day_total');
       sql.group('date(created_at)');
       const list = yield that.query(sql.toString());
       return { status, list };
