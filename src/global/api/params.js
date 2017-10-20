@@ -22,7 +22,7 @@ const paramsChecker = (ctx, name, value, typeInfo) => {
     debug(`param ${ name } run checker`);
     let msg = `'${ name }' should be valid ${ typeInfo.type }`;
     if (typeInfo.params) {
-      msg = `${ msg } with additional restrictions: ${ typeInfo._paramsJSON }`;
+      msg = `${ msg } with additional restrictions: ${ typeInfo._paramsJSON || typeInfo.params }`;
     }
     throw ctx.error.invalidParameter(msg);
   }

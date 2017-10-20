@@ -34,6 +34,7 @@ module.exports = class API {
    *   - {Function} invalidParameterError 内部错误生成方法
    */
   constructor(options = {}) {
+    debug(options);
     this.utils = require('./utils');
     this.info = options.info || {};
     this.api = {};
