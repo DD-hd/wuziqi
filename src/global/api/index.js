@@ -101,6 +101,10 @@ module.exports = class API {
     return (name, value, schema) => params.paramsChecker(this, name, value, schema);
   }
 
+  schemaChecker() {
+    return (data, schema) => params.schemaChecker(this, data, schema);
+  }
+
   /**
    * 绑定路由
    * 
