@@ -98,7 +98,7 @@ module.exports = class API {
   }
 
   paramsChecker() {
-    return (name, schema) => params.paramsChecker(this, name, schema);
+    return (name, value, schema) => params.paramsChecker(this, name, value, schema);
   }
 
   /**

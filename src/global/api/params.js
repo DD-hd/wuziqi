@@ -8,8 +8,8 @@
 
 const debug = require('./debug').params;
 
-const paramsChecker = (ctx, name, value, schema) => {
-  const type = ctx.type.get(schema.type);
+const paramsChecker = (ctx, name, value, typeInfo) => {
+  const type = ctx.type.get(typeInfo.type);
   let result = value;
   // 如果类型有 parser 则先执行
   if (type.parser) {
@@ -18,20 +18,20 @@ const paramsChecker = (ctx, name, value, schema) => {
   }
 
   // 如果类型有 checker 则检查
-  if (!type.checker(result, schema.params)) {
+  if (!type.checker(result, typeInfo.params)) {
     debug(`param ${ name } run checker`);
-    let msg = `'${ name }' should be valid ${ schema.type }`;
-    if (schema.params) {
-      msg = `${ msg } with additional restrictions: ${ schema._paramsJSON }`;
+    let msg = `'${ name }' should be valid ${ typeInfo.type }`;
+    if (typeInfo.params) {
+      msg = `${ msg } with additional restrictions: ${ typeInfo._paramsJSON }`;
     }
     throw ctx.error.invalidParameter(msg);
   }
 
   // 如果类型有 formatter 且开启了 format=true 则格式化参数
-  if (schema.format && type.formatter) {
+  if (typeInfo.format && type.formatter) {
     debug(`param ${ name } run format`);
     debug(`befor format : ${ result }`);
-    result = type.formatter(result, schema.params);
+    result = type.formatter(result, typeInfo.params);
     debug(`after format : ${ result }`);
   }
   return result;
