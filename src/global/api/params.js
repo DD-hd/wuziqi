@@ -37,43 +37,34 @@ const paramsChecker = (ctx, name, value, typeInfo) => {
   return result;
 };
 
-const schemaChecker = (ctx, data, schema) => {
+const schemaChecker = (ctx, data, schema, requiredOneOf = []) => {
   const result = {};
   for(const name in schema) {
     let value = data[name];
     const options = schema[name];
     debug(`param check ${ name } : ${ value } with ${ options }`);
-
+    
     if(typeof value === 'undefined') {
       if (options.default) {
         // 为未赋值参数添加默认值默认值
         value = options.default;
       } else {
+        if(options.required) throw ctx.error.missingParameter(`'${ name }' is required!`);
         // 其他情况忽略
         continue;
       }
     }
     result[name] = paramsChecker(ctx, name, value, options);
   }
-  // 必填参数检查
-  if (schema.options.required.size > 0) {
-    for (const name of schema.options.required) {
-      if (!(name in result)) throw ctx.error.missingParameter(`'${ name }' is required!`);
-    }
-  }
 
   // 可选参数检查
-  if (schema.options.requiredOneOf.size > 0) {
-    for (const names of schema.options.requiredOneOf) {
-      let ok = false;
-      for (const name of names) {
-        ok = typeof result[name] !== 'undefined';
-        if (ok) break;
-      }
-      if (!ok) {
-        throw ctx.error.missingParameter(`one of ${ names.join(', ') } is required`);
-      }
-    }
+  let ok = requiredOneOf.length < 1;
+  for (const name of requiredOneOf) {
+    ok = typeof result[name] !== 'undefined';
+    if (ok) break;
+  }
+  if (!ok) {
+    throw ctx.error.missingParameter(`one of ${ requiredOneOf.join(', ') } is required`);
   }
   return result;
 };
