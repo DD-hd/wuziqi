@@ -8,6 +8,35 @@
 
 const debug = require('./debug').params;
 
+const paramsChecker = (ctx, name, value, schema) => {
+  const type = ctx.type.get(schema.type);
+  let result = value;
+  // 如果类型有 parser 则先执行
+  if (type.parser) {
+    debug(`param ${ name } run parser`);
+    result = type.parser(result);
+  }
+
+  // 如果类型有 checker 则检查
+  if (!type.checker(result, schema.params)) {
+    debug(`param ${ name } run checker`);
+    let msg = `'${ name }' should be valid ${ schema.type }`;
+    if (schema.params) {
+      msg = `${ msg } with additional restrictions: ${ schema._paramsJSON }`;
+    }
+    throw ctx.error.invalidParameter(msg);
+  }
+
+  // 如果类型有 formatter 且开启了 format=true 则格式化参数
+  if (schema.format && type.formatter) {
+    debug(`param ${ name } run format`);
+    debug(`befor format : ${ result }`);
+    result = type.formatter(result, schema.params);
+    debug(`after format : ${ result }`);
+  }
+  return result;
+};
+
 /**
   * API 参数检查
   * 
@@ -35,34 +64,8 @@ function apiCheckParams(ctx, schema) {
             continue;
           }
         }
-
-        const type = ctx.type.get(options.type);
-
-        // 如果类型有 parser 则先执行
-        if (type.parser) {
-          debug(`param ${ name } run parser`);
-          value = type.parser(value);
-        }
-
-        // 如果类型有 checker 则检查
-        if (!type.checker(value, options.params)) {
-          debug(`param ${ name } run checker`);
-          let msg = `'${ name }' should be valid ${ options.type }`;
-          if (options.params) {
-            msg = `${ msg } with additional restrictions: ${ options._paramsJSON }`;
-          }
-          throw ctx.error.invalidParameter(msg);
-        }
-  
-        // 如果类型有 formatter 且开启了 format=true 则格式化参数
-        if (options.format && type.formatter) {
-          debug(`param ${ name } run format`);
-          debug(`befor format : ${ value }`);
-          newParams[name] = type.formatter(value, options.params);
-          debug(`after format : ${ newParams[name] }`);
-        } else {
-          newParams[name] = value;
-        }
+        
+        newParams[name] = paramsChecker(ctx, name, value, options);
       }
     }
 
@@ -92,4 +95,4 @@ function apiCheckParams(ctx, schema) {
   };
 }
 
-module.exports = apiCheckParams;
+module.exports = { apiCheckParams, paramsChecker };

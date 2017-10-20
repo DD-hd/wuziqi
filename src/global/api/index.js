@@ -11,7 +11,7 @@ const TypeManager = require('./manager/type');
 const registerDefaultTypes = require('./default/types');
 const Schema = require('./schema');
 const { getCallerSourceLine } = require('./utils');
-const paramChecker = require('./params');
+const params = require('./params');
 const extendDocs = require('./extend/docs');
 const extendTest = require('./extend/test');
 
@@ -97,6 +97,10 @@ module.exports = class API {
     }
   }
 
+  paramsChecker() {
+    return (name, schema) => params.paramsChecker(this, name, schema);
+  }
+
   /**
    * 绑定路由
    * 
@@ -109,7 +113,7 @@ module.exports = class API {
       schema.init(this);
       router[schema.options.method].bind(router)(
         schema.options.path,
-        paramChecker(this, schema),
+        params.apiCheckParams(this, schema),
         ...schema.options.middlewares,
         schema.options.handler
       );
