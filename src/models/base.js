@@ -401,6 +401,7 @@ class Base {
   list(conditions = {}, fields = this.fields, limit = 999, offset = 0, order = this.order, asc = true) {
     return this.query(this._list(conditions, fields, limit, offset, order, asc));
   }
+  listO(conditions = {}, fields = this.fields, pages) { return this.list(conditions, fields, pages.limit, pages.offset, pages.order, pages.asc); }
 
 
   _search(keyword, search, fields = this.fields, limit = 10, order = this.order, asc = true) {
@@ -431,6 +432,7 @@ class Base {
   search(keyword, search, fields = this.fields, limit = 10, order = this.order, asc = true) {
     return this.query(this._search(keyword, search, fields, limit, order, asc));
   }
+  searchO(keyword, search, fields = this.fields, pages) { return this.search(keyword, search, fields, pages.limit, pages.offset, pages.order, pages.asc); }
 
   /**
    * 根据条件获取分页内容（比列表多处总数计算）
@@ -449,6 +451,7 @@ class Base {
     const countSql = this.count(conditions);
     return Promise.all([ listSql, countSql ]).then(([ list, count ]) => list && count && { count, list });
   }
+  pageO(conditions = {}, fields = this.fields, pages) { return this.page(conditions, fields, pages.limit, pages.offset, pages.order, pages.asc); }
 
   /**
    * 执行事务（通过传人方法）
