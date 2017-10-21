@@ -115,9 +115,7 @@ class Base {
    */
   query(sql, connection = mysql) {
     logger.debug(sql);
-    return connection.queryAsync(sql).catch(err => {
-      errorHandler(err);
-    });
+    return connection.queryAsync(sql).catch(err => errorHandler(err));
   }
 
   _count(conditions = {}) {
@@ -134,11 +132,7 @@ class Base {
    * @memberof Base
    */
   count(conditions = {}) {
-    const that = this;
-    return co(function* () {
-      const res = yield that.query(that._count(conditions).toString());
-      return res && res[0] && res[0]['c'];
-    });
+    return this.query(this._count(conditions).toString()).then(res => res && res[0] && res[0]['c']);
   }
 
   _getByPrimary(primary, fields) {
@@ -147,6 +141,7 @@ class Base {
     fields.forEach(f => sql.field(f));
     return sql;
   }
+  _getById(id, fields) { return this._getByPrimary(id, fields); }
 
   /**
    * 根据 ID 获取数据
@@ -157,11 +152,7 @@ class Base {
    * @memberof Base
    */
   getByPrimary(primary, fields = this.fields) {
-    const that = this;
-    return co(function* () {
-      const res = yield that.query(that._getByPrimary(primary, fields).toString());
-      return res && res[0];
-    });
+    return this.query(this._getByPrimary(primary, fields).toString()).then(res => res && res[0]);
   }
   getById(id, fields = this.fields) { return this.getByPrimary(id, fields); }
 
@@ -181,17 +172,14 @@ class Base {
    * @memberof Base
    */
   getOneByField(object = {}, fields = this.fields) {
-    const that = this;
-    return co(function* () {
-      const res = yield that.query(that._getOneByField(object, fields).toString());
-      return res && res[0];
-    });
+    return this.query(this._getOneByField(object, fields).toString()).then(res => res && res[0]);
   }
 
   _deleteByPrimary(primary, limit = 1) {
     if (primary === undefined) throw errors.dataBaseError('`primary` 不能为空');
     return squel.delete().from(this.table).where(this.primaryKey + ' = ?', primary).limit(limit);
   }
+  _deleteById(primary, limit) { return this._deleteByPrimary(primary, limit); }
 
   /**
    * 根据主键删除数据
@@ -221,7 +209,7 @@ class Base {
    * @memberof Base
    */
   deleteByField(key, limit = 1) {
-    return this.query(this._deleteByField(key, limit).toString());
+    return this.query(this._deleteByField(key, limit).toString()).then(res => res && res.affectedRows);
   }
 
   /**
@@ -265,7 +253,7 @@ class Base {
    * @memberof Base
    */
   batchInsert(array) {
-    return this.query(this._batchInsert(array).toString());
+    return this.query(this._batchInsert(array).toString()).then(res => res && res.affectedRows);
   }
 
   _updateByPrimary(primary, fields, raw = false) {
@@ -285,6 +273,7 @@ class Base {
     }
     return sql;
   }
+  _updateById(primary, fields, raw) { return this._updateByPrimary(primary, fields, raw); }
 
   /**
    * 根据主键更新记录
@@ -296,11 +285,7 @@ class Base {
    * @memberof Base
    */
   updateByPrimary(primary, fields, raw = false) {
-    const that = this;
-    return co(function* () {
-      const res = yield that.query(that._updateByPrimary(primary, fields, raw).toString());
-      return res && res.changedRows === 1;
-    });
+    return this.query(this._updateByPrimary(primary, fields, raw).toString()).then(res => res && res.affectedRows);
   }
   updateById(id, fields, raw = false) { return this.updateByPrimary(id, fields, raw); }
 
@@ -333,11 +318,7 @@ class Base {
    * @memberof Base
    */
   createOrUpdate(fields, update) {
-    const that = this;
-    return co(function* () {
-      const res = yield that.query(that._createOrUpdate(fields, update).toString());
-      return res && res.changedRows === 1;
-    });
+    return this.query(this._createOrUpdate(fields, update).toString()).then(res => res && res.affectedRows);
   }
 
   _updateByField(key, fields, raw = false) {
@@ -368,11 +349,7 @@ class Base {
    * @memberof Base
    */
   updateByField(key, fields) {
-    const that = this;
-    return co(function* () {
-      const res = yield that.query(that._updateByField(key, fields).toString());
-      return res && res.changedRows === 1;
-    });
+    return this.query(this._updateByField(key, fields).toString()).then(res => res && res.affectedRows);
   }
 
   _incrFields(primary, fields, num = 1) {
@@ -391,7 +368,7 @@ class Base {
    * @memberof Base
    */
   incrFields(primary, fields, num = 1) {
-    return this.query(this._incrFields(primary, fields, num).toString());
+    return this.query(this._incrFields(primary, fields, num).toString()).then(res => res && res.affectedRows);
   }
 
   _list(conditions = {}, fields = this.fields, limit = 999, offset = 0, order = this.order, asc = true) {
@@ -462,12 +439,9 @@ class Base {
    * @memberof Base
    */
   page(conditions = {}, fields = this.fields, limit = 30, offset = 0, order = this.order, asc = true) {
-    const that = this;
-    return co(function* () {
-      const res = yield that.list(conditions, fields, limit, offset, order, asc);
-      const count = yield that.count(conditions);
-      return { count, list: res };
-    });
+    const listSql = this.list(conditions, fields, limit, offset, order, asc);
+    const countSql = this.count(conditions);
+    return Promise.all([ listSql, countSql ]).then(([ list, count ]) => list && count && { count, list });
   }
 
   /**
@@ -647,33 +621,29 @@ class Base {
    * @param {String}  table.foreign.key 主表链接key
    */
   _makeJoinCount(table = { pri: {}, foreign: {}}) {
-    const that = this;
     const { pri, foreign } = table;
     return (condition) => {
-      return co(function* () {
-        const { where, exec = true, leftJoin = false } = condition;
-        const { table: priTable, key: priKey } = pri;
-        const { table: foreignTable, key: foreignKey } = foreign;
-        const newWhere = _.transform(where, (result, value, key) => {
-          if (key.indexOf('$') === -1) {
-            result['a.' + key] = value;
-          } else {
-            result[key] = value;
-          }
-        });
-        let sql = that.squel.select().from(priTable, 'a');
-        if (leftJoin) {
-          sql.left_join(foreignTable, 'b', `a.${ priKey }=b.${ foreignKey }`);
+      const { where, exec = true, leftJoin = false } = condition;
+      const { table: priTable, key: priKey } = pri;
+      const { table: foreignTable, key: foreignKey } = foreign;
+      const newWhere = _.transform(where, (result, value, key) => {
+        if (key.indexOf('$') === -1) {
+          result['a.' + key] = value;
         } else {
-          sql.join(foreignTable, 'b', `a.${ priKey }=b.${ foreignKey }`);
+          result[key] = value;
         }
-        sql = that._countSql({ squel: sql, where: newWhere });
-        if (exec) {
-          const res = yield that.query(sql.toString());
-          return res && res[0] && res[0]['c'];
-        }
-        return sql;
       });
+      let sql = this.squel.select().from(priTable, 'a');
+      if (leftJoin) {
+        sql.left_join(foreignTable, 'b', `a.${ priKey }=b.${ foreignKey }`);
+      } else {
+        sql.join(foreignTable, 'b', `a.${ priKey }=b.${ foreignKey }`);
+      }
+      sql = this._countSql({ squel: sql, where: newWhere });
+      if (exec) {
+        return this.query(sql.toString()).then(res => res && res[0] && res[0]['c']);
+      }
+      return sql;
     };
   }
 
@@ -694,11 +664,9 @@ class Base {
     const selectList = this._makeJoinList(table);
     const selectCount = this._makeJoinCount(table);
     return (conditions) => {
-      return co(function* () {
-        const list = yield selectList(conditions);
-        const count = yield selectCount(conditions);
-        return { list, count };
-      });
+      const listSql = selectList(conditions);
+      const countSql = selectCount(conditions);
+      return Promise.all([ listSql, countSql ]).then(([ list, count ]) => list && count && { count, list });
     };
   }
 
@@ -711,19 +679,20 @@ class Base {
    * @memberof Base
    */
   getStatistics(start, end) {
-    const that = this;
-    return co(function* () {
-      const table = squel.select().from(that.table);
-      const sql0 = table.clone().field(`count(${ this.primaryKey })`, 'total').field(table.clone().field(`count(${ this.primaryKey })`).where('date(created_at) = curdate()'), 'today');
-      const [ status ] = yield that.query(sql0.toString());
-      const sql = table.clone().where('created_at >= ?', start + ' 00:00:00').where('created_at <= ?', end + ' 23:59:59').order('day', false);
-      sql.field(`count(${ this.primaryKey })`, 'day_count');
-      sql.field('date(created_at)', 'day');
-      sql.field(table.clone().field(`count(${ this.primaryKey })`).where('created_at <= DATE_ADD(`day`, INTERVAL 1 DAY) '), 'day_total');
-      sql.group('date(created_at)');
-      const list = yield that.query(sql.toString());
-      return { status, list };
-    });
+    const table = squel.select().from(this.table);
+    const statusSql = table.clone()
+      .field(`count(${ this.primaryKey })`, 'total')
+      .field(table.clone()
+        .field(`count(${ this.primaryKey })`)
+        .where('date(created_at) = curdate()'), 'today');
+    const listSql = table.clone().where('created_at >= ?', start + ' 00:00:00').where('created_at <= ?', end + ' 23:59:59').order('day', false)
+      .field(`count(${ this.primaryKey })`, 'day_count')
+      .field('date(created_at)', 'day')
+      .field(table.clone().field(`count(${ this.primaryKey })`).where('created_at <= DATE_ADD(`day`, INTERVAL 1 DAY) '), 'day_total')
+      .group('date(created_at)');
+    const statusExec = this.query(statusSql.toString());
+    const listExec = this.query(listSql.toString());
+    return Promise.all([ statusExec, listExec ]).then(([ status, list ]) => list && status && status[0] && { status: status[0], list });
   }
 
   _getAllData(conditions = {}, fields = this.fields, order = this.order, asc = true) {
