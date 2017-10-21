@@ -190,7 +190,7 @@ class Base {
    * @memberof Base
    */
   deleteByPrimary(primary, limit = 1) {
-    return this.query(this._deleteByPrimary(primary, limit).toString());
+    return this.query(this._deleteByPrimary(primary, limit).toString()).then(res => res && res.affectedRows);;
   }
   deleteById(id, limit = 1) { return this.deleteByPrimary(id, limit); }
 
@@ -253,7 +253,7 @@ class Base {
    * @memberof Base
    */
   batchInsert(array) {
-    return this.query(this._batchInsert(array).toString()).then(res => res && res.affectedRows);
+    return this.query(this._batchInsert(array).toString());
   }
 
   _updateByPrimary(primary, fields, raw = false) {
@@ -318,7 +318,7 @@ class Base {
    * @memberof Base
    */
   createOrUpdate(fields, update) {
-    return this.query(this._createOrUpdate(fields, update).toString()).then(res => res && res.affectedRows);
+    return this.query(this._createOrUpdate(fields, update).toString());
   }
 
   _updateByField(key, fields, raw = false) {
