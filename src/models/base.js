@@ -114,8 +114,14 @@ class Base {
    * @memberof Base
    */
   query(sql, connection = mysql) {
-    logger.debug(sql);
-    return connection.queryAsync(sql).catch(err => errorHandler(err));
+    if(typeof sql === 'string') {
+      logger.debug(sql);
+      return connection.queryAsync(sql).catch(err => errorHandler(err));
+    }
+    const { text, values } = sql.toParam();
+    logger.debug(text, values);
+    logger.trace(sql.toString());
+    return connection.queryAsync(text, values).catch(err => errorHandler(err));
   }
 
   _count(conditions = {}) {
@@ -132,7 +138,7 @@ class Base {
    * @memberof Base
    */
   count(conditions = {}) {
-    return this.query(this._count(conditions).toString()).then(res => res && res[0] && res[0]['c']);
+    return this.query(this._count(conditions)).then(res => res && res[0] && res[0]['c']);
   }
 
   _getByPrimary(primary, fields) {
@@ -152,7 +158,7 @@ class Base {
    * @memberof Base
    */
   getByPrimary(primary, fields = this.fields) {
-    return this.query(this._getByPrimary(primary, fields).toString()).then(res => res && res[0]);
+    return this.query(this._getByPrimary(primary, fields)).then(res => res && res[0]);
   }
   getById(id, fields = this.fields) { return this.getByPrimary(id, fields); }
 
@@ -172,7 +178,7 @@ class Base {
    * @memberof Base
    */
   getOneByField(object = {}, fields = this.fields) {
-    return this.query(this._getOneByField(object, fields).toString()).then(res => res && res[0]);
+    return this.query(this._getOneByField(object, fields)).then(res => res && res[0]);
   }
 
   _deleteByPrimary(primary, limit = 1) {
@@ -190,7 +196,7 @@ class Base {
    * @memberof Base
    */
   deleteByPrimary(primary, limit = 1) {
-    return this.query(this._deleteByPrimary(primary, limit).toString()).then(res => res && res.affectedRows);;
+    return this.query(this._deleteByPrimary(primary, limit)).then(res => res && res.affectedRows);
   }
   deleteById(id, limit = 1) { return this.deleteByPrimary(id, limit); }
 
@@ -209,7 +215,7 @@ class Base {
    * @memberof Base
    */
   deleteByField(key, limit = 1) {
-    return this.query(this._deleteByField(key, limit).toString()).then(res => res && res.affectedRows);
+    return this.query(this._deleteByField(key, limit)).then(res => res && res.affectedRows);
   }
 
   /**
@@ -237,7 +243,7 @@ class Base {
    * @memberof Base
    */
   insert(object = {}) {
-    return this.query(this._insert(object).toString());
+    return this.query(this._insert(object));
   }
 
   _batchInsert(array) {
@@ -253,7 +259,7 @@ class Base {
    * @memberof Base
    */
   batchInsert(array) {
-    return this.query(this._batchInsert(array).toString());
+    return this.query(this._batchInsert(array));
   }
 
   _updateByPrimary(primary, fields, raw = false) {
@@ -285,7 +291,7 @@ class Base {
    * @memberof Base
    */
   updateByPrimary(primary, fields, raw = false) {
-    return this.query(this._updateByPrimary(primary, fields, raw).toString()).then(res => res && res.affectedRows);
+    return this.query(this._updateByPrimary(primary, fields, raw)).then(res => res && res.affectedRows);
   }
   updateById(id, fields, raw = false) { return this.updateByPrimary(id, fields, raw); }
 
@@ -318,7 +324,7 @@ class Base {
    * @memberof Base
    */
   createOrUpdate(fields, update) {
-    return this.query(this._createOrUpdate(fields, update).toString());
+    return this.query(this._createOrUpdate(fields, update));
   }
 
   _updateByField(key, fields, raw = false) {
@@ -349,7 +355,7 @@ class Base {
    * @memberof Base
    */
   updateByField(key, fields) {
-    return this.query(this._updateByField(key, fields).toString()).then(res => res && res.affectedRows);
+    return this.query(this._updateByField(key, fields)).then(res => res && res.affectedRows);
   }
 
   _incrFields(primary, fields, num = 1) {
@@ -368,7 +374,7 @@ class Base {
    * @memberof Base
    */
   incrFields(primary, fields, num = 1) {
-    return this.query(this._incrFields(primary, fields, num).toString()).then(res => res && res.affectedRows);
+    return this.query(this._incrFields(primary, fields, num)).then(res => res && res.affectedRows);
   }
 
   _list(conditions = {}, fields = this.fields, limit = 999, offset = 0, order = this.order, asc = true) {
@@ -393,7 +399,7 @@ class Base {
    * @memberof Base
    */
   list(conditions = {}, fields = this.fields, limit = 999, offset = 0, order = this.order, asc = true) {
-    return this.query(this._list(conditions, fields, limit, offset, order, asc).toString());
+    return this.query(this._list(conditions, fields, limit, offset, order, asc));
   }
 
 
@@ -423,7 +429,7 @@ class Base {
    * @memberof Base
    */
   search(keyword, search, fields = this.fields, limit = 10, order = this.order, asc = true) {
-    return this.query(this._search(keyword, search, fields, limit, order, asc).toString());
+    return this.query(this._search(keyword, search, fields, limit, order, asc));
   }
 
   /**
@@ -605,7 +611,7 @@ class Base {
       const newOrder = order ? 'a.' + order : order;
 
       sql = this._listSql({ squel: sql, offset, limit, order: newOrder, asc, where: newWhere });
-      return exec ? this.query(sql.toString()) : sql;
+      return exec ? this.query(sql) : sql;
     };
   }
 
@@ -641,7 +647,7 @@ class Base {
       }
       sql = this._countSql({ squel: sql, where: newWhere });
       if (exec) {
-        return this.query(sql.toString()).then(res => res && res[0] && res[0]['c']);
+        return this.query(sql).then(res => res && res[0] && res[0]['c']);
       }
       return sql;
     };
@@ -690,8 +696,8 @@ class Base {
       .field('date(created_at)', 'day')
       .field(table.clone().field(`count(${ this.primaryKey })`).where('created_at <= DATE_ADD(`day`, INTERVAL 1 DAY) '), 'day_total')
       .group('date(created_at)');
-    const statusExec = this.query(statusSql.toString());
-    const listExec = this.query(listSql.toString());
+    const statusExec = this.query(statusSql);
+    const listExec = this.query(listSql);
     return Promise.all([ statusExec, listExec ]).then(([ status, list ]) => list && status && status[0] && { status: status[0], list });
   }
 
