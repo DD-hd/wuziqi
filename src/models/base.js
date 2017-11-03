@@ -449,7 +449,7 @@ class Base {
   page(conditions = {}, fields = this.fields, limit = 30, offset = 0, order = this.order, asc = true) {
     const listSql = this.list(conditions, fields, limit, offset, order, asc);
     const countSql = this.count(conditions);
-    return Promise.all([ listSql, countSql ]).then(([ list, count ]) => list && count && { count, list });
+    return Promise.all([ listSql, countSql ]).then(([ list, count = 0 ]) => list && { count, list });
   }
   pageO(conditions = {}, fields = this.fields, pages) { return this.page(conditions, fields, pages.limit, pages.offset, pages.order, pages.asc); }
 
@@ -675,7 +675,7 @@ class Base {
     return (conditions) => {
       const listSql = selectList(conditions);
       const countSql = selectCount(conditions);
-      return Promise.all([ listSql, countSql ]).then(([ list, count ]) => list && count && { count, list });
+      return Promise.all([ listSql, countSql ]).then(([ list, count ]) => list && { count, list });
     };
   }
 
