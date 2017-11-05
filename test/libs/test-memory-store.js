@@ -2,7 +2,7 @@
 
 const assert = require('chai').assert;
 
-const MemoryCache = require('../../src/lib/cache/memory');
+const MemoryStore = require('../../src/lib/cache/memory');
 
 const KEY = 'a';
 const VALUES = [
@@ -13,8 +13,8 @@ const VALUES = [
 ];
 const VAL_OBJ = VALUES[0];
 
-describe('Libs - MemoryCache immutable true', () => {
-  const cache = new MemoryCache({ ttl: 0.01 });
+describe('Libs - MemoryStore immutable true', () => {
+  const cache = new MemoryStore({ ttl: 0.01 });
   
   it('Test - simple get set delete', function () {
     assert.isUndefined(cache.get(KEY));
@@ -46,8 +46,8 @@ describe('Libs - MemoryCache immutable true', () => {
 
 });
 
-describe('Libs - MemoryCache immutable false', () => {
-  const cache = new MemoryCache({ immutable: false, ttl: 0.01 });
+describe('Libs - MemoryStore immutable false', () => {
+  const cache = new MemoryStore({ immutable: false, ttl: 0.01 });
   
   it('Test - simple get set delete', function () {
     assert.isUndefined(cache.get(KEY));

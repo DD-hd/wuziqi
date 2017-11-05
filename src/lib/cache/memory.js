@@ -1,11 +1,11 @@
 'use strict';
 
 /**
- * @file MemCache Lib
+ * @file MemoryStore Lib
  * @author Yourtion Guo <yourtion@gmail.com>
  */
 
-class MemoryCache {
+class MemoryStore {
 	
   constructor(options) {
     const { ttl = 30, immutable = true } = options;
@@ -47,24 +47,4 @@ class MemoryCache {
 
 }
 
-module.exports = MemoryCache;
-
-// const cache = new MemoryCache({ immutable: false });
-
-// console.log('get', );
-
-// cache.set('a', { a: 1 });
-// const a = cache.get('a');
-// a.a = 2;
-// a.v = 3;
-// console.log(a);
-
-// console.log('get', cache.get('a'));
-
-// cache.set('a', 2);
-
-// console.log('get', cache.get('a'));
-
-// cache.delete('a');
-
-// console.log('get', cache.get('a'));
+module.exports = MemoryStore;
