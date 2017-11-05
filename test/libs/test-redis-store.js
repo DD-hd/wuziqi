@@ -14,7 +14,7 @@ const VALUES = [
 ];
 const VAL_OBJ = VALUES[0];
 
-describe('Libs - MemoryCache immutable true', () => {
+describe('Libs - RedisStore immutable true', () => {
   const cache = new RedisStore({ ttl: 1 });
   
   it('Test - simple get set delete', function* () {
