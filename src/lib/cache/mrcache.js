@@ -9,12 +9,14 @@ const MemoryStore = require('./memory');
 const RedisStore = require('./redis');
 const debug = require('debug')('ecache:mrcache');
 
-const isEmptyValue = (v) => {
-  return (v === undefined || v === null);
-};
-
+/**
+ * 内存+Redis 二级缓存
+ */
 class MRCache {
-	
+  
+  /**
+   * @param {Object} options
+   */
   constructor(options) {
     const {
       memory = {},
@@ -27,7 +29,12 @@ class MRCache {
     this._cacheEmpty = cacheEmpty;
     this._debug = debug;
   }
-	
+  
+  /**
+   * 获取值
+   * @param {String} key Key
+   * @returns {Promise}
+   */
   get(key) {
     const data = this.mCache.get(key);
     debug('mCache:', data);
@@ -40,15 +47,27 @@ class MRCache {
       return res;
     });
   }
-	
+  
+  /**
+   * 设置值
+   * @param {String} key Key
+   * @param {Any} data 数据
+   * @param {Number} ttl TTL
+   * @returns {Promise}
+   */
   set(key, data, ttl = this.ttl) {
     if(data || this._cacheEmpty) {
       this.mCache.set(key, data);
-      return this.rCache.set(key, data);
+      return this.rCache.set(key, data, ttl);
     }
     return Promise.resolve();
   }
-	
+  
+  /**
+   * 删除值
+   * @param {String} key
+   * @returns {Promise}
+   */
   delete(key) {
     this.mCache.delete(key);
     return this.rCache.delete(key);
