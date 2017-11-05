@@ -16,7 +16,7 @@ exports.leftPad = (n, c) => {
 
 /**
  * 获取客户端IP
- * 
+ *
  * @param {Object} req 请求
  * @returns {String} ip
  */
@@ -45,7 +45,7 @@ exports.unixTime = (unixtime) => {
 
 /**
  * 获取 timestamp
- * 
+ *
  * @param {Number} [after=0] 当前时间之后的秒数
  * @returns {Number}
  */
@@ -56,9 +56,9 @@ exports.genTimestamp = (after = 0) => {
 
 /**
  * 格式化请求中的 Boolean 类型
- * 
+ *
  * @param {any} query 请求参数
- * @param {Boolean} b 默认值 
+ * @param {Boolean} b 默认值
  * @returns {Boolean}
  */
 exports.parseQueryBoolean = (query, b) => {
@@ -81,7 +81,7 @@ exports.removeUndefined = (object) => {
 
 /**
  * 将对象 object 合并到对象数组 array 元素中
- * 
+ *
  * @param {Array} array 对象数组
  * @param {Object} object 待合并对象
  * @param {String} k1 array 中对象的key
@@ -119,4 +119,20 @@ exports.getErrorSourceFromCo = (err, base = '/src/') => {
     }
   }
   return reaseon;
+};
+
+
+const url = require('url');
+/**
+ * 合并URL
+ * @param {String} dist 目标URL
+ * @param {Object} query 附加 query 对象
+ * @param {String} hash hash 参数
+ */
+exports.mergeUrl = (dist, query, hash) => {
+  const distUrl = url.parse(dist, true);
+  delete distUrl.search;
+  Object.assign(distUrl.query, query);
+  distUrl.hash = hash;
+  return url.format(distUrl);
 };
