@@ -14,5 +14,4 @@ exports.trace = (code, shipper = 'SF') => {
   return service.makeOrderTraceSync({ code, shipper });
 };
 
-
-exports.trace(457250347343, 'ZTO').then(console.log).catch(console.error);
+// exports.trace(457250347343, 'ZTO').then(console.log).catch(console.error);

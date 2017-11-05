@@ -109,7 +109,7 @@ const TestAgent = module.exports = class TestAgent {
 
   /**
    * 对测试结果加入文档
-   * 
+   *
    * @param {String} name 测试名
    * @returns {Object}
    */

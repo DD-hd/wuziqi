@@ -38,8 +38,8 @@ exports.getFileKey = (type, suffix) => {
 
 /**
  * 获取上传Token
- * @param {String} bucket 
- * @param {String} fileKey 
+ * @param {String} bucket
+ * @param {String} fileKey
  */
 const getUploadToken = (bucket, fileKey) => {
   logger.trace('getUploadToken', bucket, fileKey);

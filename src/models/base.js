@@ -11,8 +11,8 @@ const SELETE_OPT = { autoQuoteTableNames: true, autoQuoteFieldNames: true };
 
 /**
  * 删除对象中的 undefined
- * 
- * @param {Object} object 
+ *
+ * @param {Object} object
  * @returns {Object}
  */
 function removeUndefined(object) {
@@ -23,7 +23,7 @@ function removeUndefined(object) {
 
 /**
  * 解析 Where
- * 
+ *
  * @param {Object} sql Squel 对象
  * @param {Object} conditions 查询条件
  */
@@ -48,7 +48,7 @@ function _parseWhere(sql, conditions) {
 
 /**
  * 数据库错误处理
- * 
+ *
  * @param {Error} err 错误
  */
 function errorHandler(err) {
@@ -76,7 +76,7 @@ class Base {
   /**
    * Creates an instance of Base.
    * @param {String} table 表名
-   * @param {Object} [options={}] 
+   * @param {Object} [options={}]
    *   - {Object} fields 默认列
    *   - {Object} order 默认排序字段
    * @memberof Base
@@ -93,9 +93,9 @@ class Base {
 
   /**
    * 输出 SQL Debug
-   * 
+   *
    * @param {String} name Debug 前缀
-   * @returns {String} SQL 
+   * @returns {String} SQL
    * @memberof Base
    */
   debugSQL(name) {
@@ -107,7 +107,7 @@ class Base {
 
   /**
    * 查询方法（内部查询尽可能调用这个，会打印Log）
-   * 
+   *
    * @param {String} sql SQL字符串
    * @param {Object} [connection=mysql] Mysql连接，默认为pool
    * @returns {Promise}
@@ -132,7 +132,7 @@ class Base {
 
   /**
    * 计算数据表 count
-   * 
+   *
    * @param {Object} [conditions={}] 条件
    * @returns {Promise}
    * @memberof Base
@@ -151,7 +151,7 @@ class Base {
 
   /**
    * 根据 ID 获取数据
-   * 
+   *
    * @param {Number} primary 主键
    * @param {Array} [fields=this.fields] 所需要的列数组
    * @returns {Promise}
@@ -171,7 +171,7 @@ class Base {
 
   /**
    * 根据查询条件获取一条记录
-   * 
+   *
    * @param {Object} [object={}] 字段、值对象
    * @param {Array} [fields=this.fields] 所需要的列数组
    * @returns {Promise}
@@ -189,7 +189,7 @@ class Base {
 
   /**
    * 根据主键删除数据
-   * 
+   *
    * @param {Number} primary 主键
    * @param {Number} [limit=1] 删除条数
    * @returns {Promise}
@@ -208,7 +208,7 @@ class Base {
 
   /**
    * 根据查询条件删除数据
-   * 
+   *
    * @param {Object} [object={}] 字段、值对象
    * @param {Number} [limit=1] 删除条数
    * @returns {Promise}
@@ -220,7 +220,7 @@ class Base {
 
   /**
    * 根据查询条件获取记录
-   * 
+   *
    * @param {Object} [object={}] 字段、值对象
    * @param {Array} [fields=this.fields] 所需要的列数组
    * @returns {Promise}
@@ -237,7 +237,7 @@ class Base {
 
   /**
    * 插入一条数据
-   * 
+   *
    * @param {Object} [object={}] 插入的数据对象
    * @returns {Promise}
    * @memberof Base
@@ -253,7 +253,7 @@ class Base {
 
   /**
    * 批量插入数据
-   * 
+   *
    * @param {Array<Object>} array 插入的数据对象数组
    * @returns {Promise}
    * @memberof Base
@@ -283,7 +283,7 @@ class Base {
 
   /**
    * 根据主键更新记录
-   * 
+   *
    * @param {Number} primary 主键
    * @param {Object} fields 更新的内容对象
    * @param {Boolean} raw 是否解析 field 对象
@@ -317,7 +317,7 @@ class Base {
 
   /**
    * 创建一条记录，如果存在就更新
-   * 
+   *
    * @param {Object} fields 创建记录对象
    * @param {Array} update 更新字段
    * @returns {Promise}
@@ -348,7 +348,7 @@ class Base {
 
   /**
    * 根据查询条件更新记录
-   * 
+   *
    * @param {Object} key 查询条件对象
    * @param {Object} fields 更新的内容对象
    * @returns {Promise}
@@ -367,7 +367,7 @@ class Base {
 
   /**
    * 根据主键对数据列执行加一操作
-   * 
+   *
    * @param {Number} primary 主键
    * @param {Array} fields 需要更新的列数组
    * @returns {Promise}
@@ -388,7 +388,7 @@ class Base {
 
   /**
    * 根据条件获取列表
-   * 
+   *
    * @param {Object} [conditions={}] 查询条件对象
    * @param {Array} [fields=this.fields] 需要查询的字段
    * @param {Number} [limit=999] 限制条数
@@ -419,7 +419,7 @@ class Base {
 
   /**
    * 根据关键词进行搜索
-   * 
+   *
    * @param {String} keyword 关键词
    * @param {Array} search 搜索字段
    * @param {Array} [fields=this.fields] 需要查询的字段
@@ -436,7 +436,7 @@ class Base {
 
   /**
    * 根据条件获取分页内容（比列表多处总数计算）
-   * 
+   *
    * @param {Object} [conditions={}] 查询条件对象
    * @param {Array} [fields=this.fields] 需要查询的字段
    * @param {Number} [limit=999] 限制条数
@@ -455,9 +455,9 @@ class Base {
 
   /**
    * 执行事务（通过传人方法）
-   * 
-   * @param {String} name 
-   * @param {Function} func 
+   *
+   * @param {String} name
+   * @param {Function} func
    * @memberof Base
    */
   transactions(name, func) {
@@ -493,7 +493,7 @@ class Base {
 
   /**
    * 执行事务（通过传人SQL语句数组）
-   * 
+   *
    * @param {Array<String>} sqls SQL语言数组
    * @returns {Promise}
    * @memberof Base
@@ -524,7 +524,7 @@ class Base {
 
   /**
    * 拼凑查询列表的sql语句
-   * @param {Object}  condition 
+   * @param {Object}  condition
    * @param {Object}  condition.where 查询限制条件
    * @param {Squel}   condition.squel sql拼凑对象
    * @param {Number}  condition.offset 开始下标
@@ -543,7 +543,7 @@ class Base {
 
   /**
    * 拼凑查询总数的sql语句
-   * @param {Object}  condition 
+   * @param {Object}  condition
    * @param {Object}  condition.where 查询限制条件
    * @param {Squel}   condition.squel sql拼凑对象
    */
@@ -620,7 +620,7 @@ class Base {
 
   /**
    * 生成join查询列表的总数函数
-   * 
+   *
    * @param {Object}  table 表相关信息
    * @param {Object}  table.pri 主表
    * @param {Object}  table.foreign 副表
@@ -658,7 +658,7 @@ class Base {
 
   /**
    * 生成join查询列表的函数
-   * 
+   *
    * @param {Object}  table 表相关信息
    * @param {Object}  table.pri 主表
    * @param {Object}  table.foreign 副表
@@ -681,7 +681,7 @@ class Base {
 
   /**
    * 获取统计信息通用方法
-   * 
+   *
    * @param {String} start 开始时间
    * @param {String} end 结束时间
    * @returns {Promise}
@@ -714,9 +714,9 @@ class Base {
 
   /**
    * 异步获取所有数据，按行返回
-   * 
+   *
    * @param {any} [conditions={}] 查询条件
-   * @param {any} [fields=this.fields] 查询字段 
+   * @param {any} [fields=this.fields] 查询字段
    * @param {any} [order=this.order] 排序字段
    * @param {boolean} [asc=true] 是的正向排序
    * @returns {Promise}

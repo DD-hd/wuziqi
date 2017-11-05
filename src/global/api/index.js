@@ -23,7 +23,7 @@ module.exports = class API {
 
   /**
    * Creates an instance of API.
-   * @param {Objcet} [options={}] 
+   * @param {Objcet} [options={}]
    *   - {Object} info 信息
    *   - {Object} groups 分组
    *   - {String} path 路由文件所在路径
@@ -108,7 +108,7 @@ module.exports = class API {
 
   /**
    * 绑定路由
-   * 
+   *
    * @param {Object} [router=this.router] 路由
    */
   bindRouter(router = this.router) {

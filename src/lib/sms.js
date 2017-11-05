@@ -22,8 +22,8 @@ const AUTH_CODE_KEY = 'SMS_AUTH_CODE:';
 
 /**
  * 获取手机验证码 Redis Key
- * 
- * @param {Number} phone 
+ *
+ * @param {Number} phone
  * @returns {String}
  */
 function getKey(phone) {
@@ -32,10 +32,10 @@ function getKey(phone) {
 
 /**
  * 发送短信
- * @example 
+ * @example
  * // returns Promise
  * sendSMS(18500083338, 'SMS_86695039', { user:"Yourtion" }, '钇钛网')
- * 
+ *
  * @param {Number} phone 手机号
  * @param {Object} params 参数
  * @param {String} [template=conf.default_template] 模版
@@ -53,7 +53,7 @@ const sendSMS = exports.sendSMS = (phone, template, params, sign = conf.signName
 
 /**
  * 发送验证码
- * 
+ *
  * @param {Number} phone 手机号
  * @returns {Promise}
  */
@@ -68,7 +68,7 @@ exports.sendAuthCode = coroutine.wrap(function* (phone) {
 
 /**
  * 验证短信验证码
- * 
+ *
  * @param {Number} phone 手机号
  * @param {Number} params 验证码
  * @returns {Promise}
@@ -84,7 +84,7 @@ exports.verifyAuthCode = coroutine.wrap(function* (phone, code) {
 
 /**
  * 删除短信验证码
- * 
+ *
  * @param {Number} phone 手机号
  * @returns {Promise}
  */

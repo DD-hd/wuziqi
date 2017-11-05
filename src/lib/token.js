@@ -30,7 +30,7 @@ class TokenProvider {
 
   /**
      * 生成token
-     * @param {*} data 
+     * @param {*} data
      */
   encrypt(data) {
     const that = this;
@@ -49,7 +49,7 @@ class TokenProvider {
 
   /**
      * 解析token的信息
-     * @param {*} token 
+     * @param {*} token
      */
   decrypt(token) {
     const that = this;

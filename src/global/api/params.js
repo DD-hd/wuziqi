@@ -71,7 +71,7 @@ const schemaChecker = (ctx, data, schema, requiredOneOf = []) => {
 
 /**
   * API 参数检查
-  * 
+  *
   * @param {Object} ctx 上下文
   * @param {Object} schema 定义
   * @returns {Function} 中间件

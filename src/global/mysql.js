@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @file 
+ * @file
  * @author Yourtion Guo <yourtion@gmail.com>
  */
 const mysql = require('mysql');

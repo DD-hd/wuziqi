@@ -38,7 +38,7 @@ exports.types = {
 
 /**
  * 参数构造
- * 
+ *
  * @param {String} type 参数类型
  * @param {any} comment 参数说明
  * @param {any} required 是否必填
