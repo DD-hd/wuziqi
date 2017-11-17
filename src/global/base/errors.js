@@ -7,7 +7,7 @@
 
 const assert = require('assert');
 
-const errorInfo = {
+const errorInfo = Object.freeze({
   'InternalError': { code: -1000, desc: '内部错误', show: true, log: true },
   'MissingParameter': { code: -1001, desc: '缺少参数', show: true, log: false },
   'InvalidParameter': { code: -1002, desc: '参数不合法', show: true, log: false },
@@ -19,7 +19,7 @@ const errorInfo = {
   'CartFullError': { code: -1008, desc: '购物车已经满了', show: true, log: false },
   'ExceInvalidError': { code: -1009, desc: '不合法执行', show: true, log: false },
   'DependError': { code: -1010, desc: '数据存在依赖', show: true, log: false },
-};
+});
 
 assert(new Set(Object.keys(errorInfo).map(k => errorInfo[k].code)).size === Object.keys(errorInfo).length, 'Error code 必须唯一');
 

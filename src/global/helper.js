@@ -9,7 +9,7 @@ const { utils, config } = require('./base');
 /**
  * 类型枚举
  */
-exports.types = {
+exports.types = Object.freeze({
   Boolean: 'Boolean',
   Date: 'Date',
   String: 'String',
@@ -34,7 +34,7 @@ exports.types = {
   IntArray: 'IntArray',
   NullableString: 'NullableString',
   NullableInteger: 'NullableInteger',
-};
+});
 
 /**
  * 参数构造
@@ -52,14 +52,14 @@ exports.build = function build(type, comment, required, defaultValue, params) {
 /**
  * 分页默认模版
  */
-exports.PAGEING = {
+exports.PAGEING = Object.freeze({
   page: { type: 'Integer', comment: '第n页', default: 1 },
   page_count: { type: 'Integer', comment: '每页数量（默认30）', default: config.model.limit },
   order: { type: 'String', comment: '排序字段（默认id）' },
   asc: { type: 'Boolean', comment: '是否升序（默认false）' },
-};
+});
 
-exports.PINGPPWEBHOOK = {
+exports.PINGPPWEBHOOK = Object.freeze({
   id: { type: 'String', comment: 'ID' },
   created: { type: 'Integer', comment: '创建时间戳' },
   livemode: { type: 'Boolean', comment: '是否发生在生产环境' },
@@ -68,4 +68,4 @@ exports.PINGPPWEBHOOK = {
   object: { type: 'String', comment: '值为 "event"' },
   pending_webhooks: { type: 'Integer', comment: '推送未成功的 webhooks 数量' },
   request: { type: 'String', comment: 'API Request ID' },
-};
+});
