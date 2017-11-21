@@ -130,6 +130,18 @@ const Schema = module.exports = class Schema {
   }
 
   /**
+   * 输出结果对象
+   * 
+   * @param {Object} schema 输出结果对象
+   * @return {Object}
+   */
+  schema(schema) {
+    assert(typeof schema === 'object', '`schema`必须是一个对象');
+    this.options.schema = schema;
+    return this;
+  }
+
+  /**
    * 输入参数
    *
    * @param {String} name 参数名称

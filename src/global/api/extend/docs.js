@@ -13,7 +13,7 @@ const debug = require('../debug').docs;
 const generateMarkdown = require('../plugin/generate_markdown');
 const generateSwagger = require('../plugin/generate_swagger');
 
-const DOC = [ 'method', 'path', 'examples', 'middlewares', 'required', 'requiredOneOf', 'query', 'body', 'params', 'group', 'title', 'description' ];
+const DOC = [ 'method', 'path', 'examples', 'middlewares', 'required', 'requiredOneOf', 'query', 'body', 'params', 'group', 'title', 'description', 'schema' ];
 
 module.exports = function extendDocs() {
 

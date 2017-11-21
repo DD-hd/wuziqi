@@ -183,6 +183,22 @@ function schemaDocs(data) {
     return list.join('\n');
   }
 
+  function schemaTable(item) {
+    
+    const list = [];
+    list.push(`参数名 | 类型 | 说明`);
+    list.push(`------|-----|-----`);
+    for (const name in item) {
+      const info = item[name];
+      list.push(`
+\`${ stringOrEmpty(name) }\` | ${ stringOrEmpty(info.type) } | ${ stringOrEmpty(info.comment) }
+      `.trim());
+    }
+  
+    if (list.length === 2) return;
+    return list.join('\n');
+  }
+
   function formatExampleInput(data) {
     const ret = Object.assign({}, data);
     for (const name in ret) {
@@ -225,7 +241,14 @@ ${ paramsDoc }
     } else {
       line += '\n参数：无参数\n';
     }
-
+    const schemaDoc = schemaTable(item.schema);
+    if (schemaDoc) {
+      line += `
+### 输出结果说明：
+  
+${ schemaDoc }
+`;
+    }
 
     if (item.examples.length > 0) {
       line += `
