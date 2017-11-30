@@ -1,32 +1,36 @@
 const fs = require('fs');
 const path = require('path');
-const debug = require('debug')('exam:table_model:');
+const debug = require('debug')('eapi:create_router:');
+const { utils } = require('../src/global');
 
 const CONTROLLER_PATH = path.resolve(__dirname, '../src/routers/');
 const genTable = (name) => {
   debug(name);
+  const createTime = new Date().toString();
+  const nameCamel = utils.underscore2camelCase(name);
   const str = `'use strict';
 /**
- * @file 专题路由
+ * @file 路由
  * @author Yourtion Guo <yourtion@gmail.com>
+ * @time ${ createTime }
  */
-const ${ name }Controller = require('../controllers/${ name }');
+const ${ nameCamel }Controller = require('../controllers/${ name }');
 const { helper, TYPES } = require('../global');
 const { middlewares } = require('../lib');
-const ${ name }Schema = require('../schemas/${ name }');
+const { ${ nameCamel }Schema } = require('../schemas');
 
 module.exports = (api) => {
 
-    api.post('/${ name }')
-        .group('${ name }')
-        .title('${ name }')
-        .query(Object.assign({
-            id: ${ name }Schema.id,
-        }, helper.Integer))
-        .middlewares(
-            middlewares.parsePages
-        )
-        .register(${ name }Controller.add${ name });
+  api.post('/${ name }')
+    .group('${ utils.firstUpperCase(name) }')
+    .title('${ name }')
+    .query(Object.assign({
+      id: ${ name }Schema.id,
+    }, helper.Integer))
+    .middlewares(
+      middlewares.parsePages
+    )
+    .register(${ nameCamel }Controller.add${ name });
 };
 `;
   const _path = CONTROLLER_PATH + '/' + name + '.js';

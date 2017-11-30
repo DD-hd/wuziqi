@@ -5,23 +5,24 @@
  * @author Yourtion Guo <yourtion@gmail.com>
  */
 
-const { mysql, co, TYPES } = require('../src/global');
+const { mysql, co, TYPES, config } = require('../src/global');
 const util = require('util');
 const fs = require('fs');
 const path = require('path');
-const debug = require('debug')('exam:table_info:');
+const debug = require('debug')('eapi:table_info:');
 
 const SCHEMA_PATH = path.resolve(__dirname, '../src/schemas');
+const tablePrefix = config.tablePrefix || '';
 
 const SKIP = ['created_at', 'updated_at'];
 
-function* tableInfo(name) {
-  const res = yield mysql.queryAsync('show full columns from `' + name + '`');
+function* tableInfo(prefix, name) {
+  const res = yield mysql.queryAsync('show full columns from `' + prefix + name + '`');
   return res;
 }
 
-function* tableToScheam(tableName){
-  const table = yield* tableInfo(tableName);
+function* tableToScheam(tablePrefix, tableName){
+  const table = yield* tableInfo(tablePrefix, tableName);
   return convertTable(table);
 }
 
@@ -78,8 +79,8 @@ const genAll = co.wrap(function* (writeTofile){
   for(const t of tables){
     const tableName = t['Name'];
     const tableCommet = t['Comment'];
-    debug(tableName, tableCommet);
-    res[tableName] = yield* tableToScheam(tableName);
+    debug(tablePrefix, tableName, tableCommet);
+    res[tableName] = yield* tableToScheam(tablePrefix, tableName);
     debug(res[tableName]);
     if(!writeTofile) {
       console.log(tableName + ':');
@@ -101,9 +102,9 @@ module.exports = ${ util.inspect(res[tableName], false, null) };
   // console.log(res);
 });
 
-const genTable = co.wrap(function* (tableName){
-  debug(tableName);
-  const res = yield* tableToScheam(tableName);
+const genTable = co.wrap(function* (tablePrefix, tableName){
+  debug(tablePrefix, tableName);
+  const res = yield* tableToScheam(tablePrefix, tableName);
   console.log(util.inspect(res, false, null));
 });
 

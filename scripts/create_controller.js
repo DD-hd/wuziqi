@@ -1,25 +1,28 @@
 const fs = require('fs');
 const path = require('path');
-const debug = require('debug')('exam:table_model:');
+const debug = require('debug')('eapi:create_controller:');
+const { utils } = require('../src/global');
 
 const CONTROLLER_PATH = path.resolve(__dirname, '../src/controllers');
 const genTable = (name) => {
   debug(name);
   const createTime = new Date().toString();
+  const nameCamel = utils.underscore2camelCase(name);
   const str = `'use strict';
 /**
- * @author dd
+ * @file 控制器
+ * @author Yourtion Guo <yourtion@gmail.com>
  * @time ${ createTime }
  */
-const ${ name }Model = require('../models/${ name }');
+const { ${ nameCamel }Model } = require('../models');
 const { errors, log4js, utils } = require('../global');
 const logger = log4js.getLogger();
 
 /**
  * 获取考点列表
  */
-exports.add${ name[0].toUpperCase() + name.slice(1) } = function* (req, res) {
-  logger.trace('add${ name[0].toUpperCase() + name.slice(1) }: ');
+exports.add${ nameCamel } = function* (req, res) {
+  logger.trace('add${ nameCamel }: req.$params');
   const result=null;
   if(result){
      req.success();

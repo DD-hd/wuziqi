@@ -136,3 +136,22 @@ exports.mergeUrl = (dist, query, hash) => {
   distUrl.hash = hash;
   return url.format(distUrl);
 };
+
+/**
+ * 首字母大写
+ * @param {String} str 输入字符串
+ */
+exports.firstUpperCase = (str) => {
+  return str.replace(/^\S/, (s) => { return s.toUpperCase(); });
+};
+
+/**
+ * 下划线转驼峰
+ * @param {String} str 输入字符串
+ */
+exports.underscore2camelCase = (str) => {
+  return str
+    .replace(/^[_.\- ]+/, '')
+    .toLowerCase()
+    .replace(/[_.\- ]+(\w|$)/g, (m, p1) => p1.toUpperCase());
+};
