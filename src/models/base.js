@@ -36,6 +36,10 @@ function _parseWhere(sql, conditions) {
       } else {
         sql.where(conditions[k]);
       }
+    } else if (k.indexOf('#') !== -1) {
+      sql.where(`${ k.replace('#', '') } like ?`, '%' + conditions[k] + '%');
+    } else if (k.indexOf('$') !== -1) {
+      sql.where(k.replace('$', ''), conditions[k]);
     } else if (_.isArray(conditions[k])) {
       // 数组类型使用 in 方式
       sql.where(`${ k } in ?`, conditions[k]);
@@ -61,12 +65,16 @@ function errorHandler(err) {
   case 'ER_DUP_ENTRY':
     throw errors.repeatError();
   default:
-    logger.error({
-      code: err.code,
-      msg: err.sqlMessage,
-      sql: err.sql,
-      source,
-    });
+    if(err.sql) {
+      logger.error({
+        code: err.code,
+        msg: err.sqlMessage,
+        sql: err.sql,
+        source,
+      });
+    } else {
+      logger.error(err);
+    }
     throw errors.dataBaseError();
   }
 }
@@ -82,8 +90,9 @@ class Base {
    * @memberof Base
    */
   constructor(table, options = {}) {
+    const tablePrefix = options.prefix !== undefined ? options.prefix : config.tablePrefix;
     this.squel = squel;
-    this.table = table;
+    this.table = tablePrefix ? tablePrefix + table : table;
     this.primaryKey = options.primaryKey || 'id';
     this.fields = options.fields || [];
     this.order = options.order;
