@@ -12,7 +12,7 @@ const validator = require('validator');
 module.exports = function defaultTypes(type) {
 
   type.register('Boolean', {
-    checker: (v) => typeof v === 'boolean' || (typeof v === 'string' && validator.isBoolean(v)),
+    checker: (v) => typeof v === 'boolean' || (typeof v === 'string' && validator.isBoolean(v)) || v === 0 || v === 1,
     formatter: (v) => String(v).toLowerCase() === 'true',
     description: '布尔值',
     isDefault: true,
