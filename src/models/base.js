@@ -98,6 +98,7 @@ class Base {
     this.order = options.order;
     this.SELETE_OPT = SELETE_OPT;
     this.removeUndefined = removeUndefined;
+    this._parseWhere = _parseWhere;
   }
 
   /**

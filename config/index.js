@@ -8,6 +8,7 @@ const env = process.env.NODE_ENV || 'dev';
 
 const base = {
   env,
+  tablePrefix: '',
   cookieMaxAge: 3600000 * 24 * 10, // 默认 cookies 时间
   sessionSecret: 'skdaliowrndksa', // session 密钥
   sessionPrefix: 'eapi:', // session 前缀
