@@ -6,6 +6,7 @@
 const http = require('http');
 const { mysql, redis, log4js, config } = require('./global');
 const app = require('./app');
+const pjson = require('../package.json');
 
 const server = http.createServer(app);
 
@@ -13,7 +14,7 @@ const PORT = config.port || process.env.PORT || 3001;
 const HOST = config.host || process.env.HOST || '127.0.0.1';
 server.listen(PORT, HOST, function () {
   // eslint-disable-next-line no-console
-  console.log(`API Server is listening on ${ HOST }:${ PORT }`);
+  console.log(`${ pjson.name } is listening on ${ HOST }:${ PORT }`);
   process.send && process.send('ready');
 });
 

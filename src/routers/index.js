@@ -14,7 +14,7 @@ module.exports = (router, api) => {
   });
 
   api.get('/index')
-    .group('Index')
+    .group('Base')
     .title('测试路由')
     .register((req, res) => {
       res.success('Hello, API Framework Index');

@@ -16,5 +16,4 @@ module.exports = Object.assign({}, base, {
   log4js: require('./log4js'),
   mysql: require('./mysql'),
   redis: require('./redis'),
-  _: require('lodash'),
 });
