@@ -6,7 +6,6 @@
  */
 module.exports = {
   _: require('lodash'),
-  xss: require('xss'),
   errors: require('./errors'),
   utils: require('./utils'),
   config: require('../../../config'),
