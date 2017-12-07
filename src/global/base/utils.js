@@ -4,8 +4,10 @@
  * @file 辅助函数
  * @author Yourtion Guo <yourtion@gmail.com>
  */
-exports = module.exports = require('lei-utils');
 
+/**
+ * leftPad
+ */
 exports.leftPad = (n, c) => {
   let res = String(n);
   while (res.length < c) {
