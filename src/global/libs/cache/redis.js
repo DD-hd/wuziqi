@@ -20,7 +20,7 @@ class RedisCache {
       host: options.host || '127.0.0.1',
       port: options.port || 6379,
       db: options.db || 0,
-      prefix: options.keyPrefix ? options.keyPrefix + 'c:' : 'cache:',
+      keyPrefix: options.keyPrefix ? options.keyPrefix + 'c:' : 'cache:',
       password: options.password,
     });
     this.ttl = options.ttl || 600;

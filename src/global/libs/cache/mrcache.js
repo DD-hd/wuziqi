@@ -7,6 +7,7 @@
 
 const MemoryStore = require('./memory');
 const RedisStore = require('./redis');
+const events = require('events');
 const debug = require('debug')('ecache:mrcache');
 
 /**
@@ -22,12 +23,11 @@ class MRCache {
       memory = {},
       redis = {},
       cacheEmpty = true,
-      debug = false,
     } = options;
     this.mCache = new MemoryStore(memory);
     this.rCache = new RedisStore(redis);
     this._cacheEmpty = cacheEmpty;
-    this._debug = debug;
+    this.emitter = new events.EventEmitter();
   }
   
   /**
@@ -44,7 +44,7 @@ class MRCache {
       if(res || this._cacheEmpty) {
         this.mCache.set(key, res);
       }
-      return res;
+      return res !== null ? res : undefined;
     });
   }
   
@@ -56,6 +56,7 @@ class MRCache {
    * @returns {Promise}
    */
   set(key, data, ttl = this.ttl) {
+    debug('set:', key, data, ttl);
     if(data || this._cacheEmpty) {
       this.mCache.set(key, data);
       return this.rCache.set(key, data, ttl);
@@ -69,6 +70,7 @@ class MRCache {
    * @returns {Promise}
    */
   delete(key) {
+    debug('set:', key);
     this.mCache.delete(key);
     return this.rCache.delete(key);
   }
