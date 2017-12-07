@@ -9,7 +9,6 @@ const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
 const { config, redis, log4js } = require('../global');
 const logger = log4js.getLogger();
-// const xss = require('xss');
 
 exports.session = session({
   store: new RedisStore({
@@ -17,20 +16,23 @@ exports.session = session({
     prefix: config.sessionPrefix,
   }),
   secret: config.sessionSecret,
-  resave: true,
-  saveUninitialized: true,
+  resave: false,
+  httpOnly: false,
+  name: config.cookieName || config.sessionPrefix,
+  cookie: {
+    maxAge: 3600000 * 12,
+  },
+  maxAge: config.cookieMaxAge,
+  saveUninitialized: false,
 });
 
-// exports.xssFilter = (params) => {
-//   return (req, res, next) => {
-//     params.forEach((param) => {
-//       if (req.$params[param]) {
-//         req.$params[param] = xss(req.$params[param]);
-//       }
-//       next();
-//     });
-//   };
-// };
+exports.cros = (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , Cookie');
+  res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS, PATCH');
+  next();
+};
 
 exports.parsePages = function (req, res, next) {
   const param = req.$params || req.query;
