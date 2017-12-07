@@ -5,7 +5,7 @@
  * @author Yourtion Guo <yourtion@gmail.com>
  */
 
-const { mysql, co, TYPES, config } = require('../src/global');
+const { mysql, co, TYPES, config, utils } = require('../src/global');
 const util = require('util');
 const fs = require('fs');
 const path = require('path');
@@ -62,7 +62,7 @@ function convertTable(table) {
     if (SKIP.indexOf(row.Field) > -1) continue;
     // console.log(row.Field,row.Type, row.Comment);
     res[row.Field] = {
-      type: convertFiled(row.Type, row.Null === 'YES'),
+      type: convertFiled(row.Type, row.Null === 'YES', row.Field),
       comment: row.Comment,
     };
     if(res[row.Field].type === TYPES.ENUM) {
@@ -77,7 +77,9 @@ const genAll = co.wrap(function* (writeTofile){
   const tables = yield mysql.queryAsync('show table status');
   debug(tables);
   for(const t of tables){
-    const tableName = t['Name'];
+    const tableFullName = t['Name'];
+    if(tableFullName.indexOf(tablePrefix) === -1) continue;
+    const tableName = tableFullName.replace(tablePrefix, '');
     const tableCommet = t['Comment'];
     debug(tablePrefix, tableName, tableCommet);
     res[tableName] = yield* tableToScheam(tablePrefix, tableName);
@@ -88,15 +90,24 @@ const genAll = co.wrap(function* (writeTofile){
       console.log('----------------------------------------');
     } else {
       const str = `'use strict';
-      
+
 /**
  * @file ${ tableName } schema ${ tableCommet }
  * @author Yourtion Guo <yourtion@gmail.com>
  */
 
 module.exports = ${ util.inspect(res[tableName], false, null) };
- `;
+`.replace('module.exports = { ', 'module.exports = {\n  ').replace('} };', '},\n};');
+
       fs.writeFileSync(SCHEMA_PATH + '/' + tableName + '.js', str, 'utf8');
+      const indexPath = SCHEMA_PATH + '/index.js';
+      const index = fs.readFileSync(indexPath).toString();
+      const nameCamel = utils.underscore2camelCase(tableName);
+      const schemaText = `${ nameCamel }Schema: require('./${ tableName }')`;
+      if(index.indexOf(schemaText) === -1) {
+        const indexNew = index.replace('};', `  ${ schemaText },\n};`);
+        fs.writeFileSync(indexPath, indexNew, 'utf8');
+      }
     }
   }
   // console.log(res);

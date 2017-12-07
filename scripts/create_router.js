@@ -4,16 +4,15 @@ const debug = require('debug')('eapi:create_router:');
 const { utils } = require('../src/global');
 
 const CONTROLLER_PATH = path.resolve(__dirname, '../src/routers/');
-const genTable = (name) => {
+const genRouter = (name) => {
   debug(name);
-  const createTime = new Date().toString();
   const nameCamel = utils.underscore2camelCase(name);
   const str = `'use strict';
 /**
- * @file 路由
+ * @file ${ nameCamel }路由
  * @author Yourtion Guo <yourtion@gmail.com>
- * @time ${ createTime }
  */
+
 const ${ nameCamel }Controller = require('../controllers/${ name }');
 const { helper, TYPES } = require('../global');
 const { middlewares } = require('../lib');
@@ -21,12 +20,10 @@ const { ${ nameCamel }Schema } = require('../schemas');
 
 module.exports = (api) => {
 
-  api.post('/${ name }')
+  api.get('/${ name }s')
     .group('${ utils.firstUpperCase(name) }')
     .title('${ name }')
-    .query(Object.assign({
-      id: ${ name }Schema.id,
-    }, helper.Integer))
+    .query(helper.PAGEING)
     .middlewares(
       middlewares.parsePages
     )
@@ -34,17 +31,17 @@ module.exports = (api) => {
 };
 `;
   const _path = CONTROLLER_PATH + '/' + name + '.js';
-  if (!fs.existsSync(_path)) {
-    fs.writeFileSync(_path, str, 'utf8');
-  } else {
-    throw new Error(`router ${ name } 已经存在`);
+  if (fs.existsSync(_path)) {
+    return Promise.reject(new Error(`router ${ name } 已经存在`));
   }
+  fs.writeFileSync(_path, str, 'utf8');
+  return Promise.resolve(_path);
 };
 
 debug(process.argv);
 
 if (process.argv.length > 2) {
-  genTable(process.argv[2])
+  genRouter(process.argv[2])
     .then(_res => {
       console.log(`创建router ${ process.argv[2] }成功`);
       process.exit(0);

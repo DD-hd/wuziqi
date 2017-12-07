@@ -4,24 +4,22 @@ const debug = require('debug')('eapi:create_controller:');
 const { utils } = require('../src/global');
 
 const CONTROLLER_PATH = path.resolve(__dirname, '../src/controllers');
-const genTable = (name) => {
+const genController = (name) => {
   debug(name);
-  const createTime = new Date().toString();
   const nameCamel = utils.underscore2camelCase(name);
   const str = `'use strict';
 /**
- * @file 控制器
+ * @file ${ nameCamel }控制器
  * @author Yourtion Guo <yourtion@gmail.com>
- * @time ${ createTime }
  */
 const { ${ nameCamel }Model } = require('../models');
 const { errors, log4js, utils } = require('../global');
 const logger = log4js.getLogger();
 
 /**
- * 获取考点列表
+ * 获取列表
  */
-exports.add${ nameCamel } = function* (req, res) {
+exports.list = function* (req, res) {
   logger.trace('add${ nameCamel }: req.$params');
   const result=null;
   if(result){
@@ -32,18 +30,17 @@ exports.add${ nameCamel } = function* (req, res) {
 };
 `;
   const _path = CONTROLLER_PATH + '/' + name + '.js';
-  if (!fs.existsSync(_path)) {
-    fs.writeFileSync(_path, str, 'utf8');
-  } else {
-    throw new Error(`controller ${ name } 已经存在`);
+  if (fs.existsSync(_path)) {
+    return Promise.reject(new Error(`controller ${ name } 已经存在`));
   }
-  return _path;
+  fs.writeFileSync(_path, str, 'utf8');
+  return Promise.resolve(_path);
 };
 
 debug(process.argv);
 
 if (process.argv.length > 2) {
-  genTable(process.argv[2])
+  genController(process.argv[2])
     .then(_res => {
       console.log(`创建controller ${ process.argv[2] }成功`);
       process.exit(0);

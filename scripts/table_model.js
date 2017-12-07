@@ -43,7 +43,7 @@ const genTable = co.wrap(function* (tablePrefix, tableName) {
   const resStr = util.inspect(res, false, null).replace(/\n/g, '');
   const tableString = utils.firstUpperCase(utils.underscore2camelCase(tableName));
   const str = `'use strict';
-  
+
 /**
 * @file ${ tableName } model ${ tableCommet }
 * @author Yourtion Guo <yourtion@gmail.com>
@@ -52,14 +52,14 @@ const genTable = co.wrap(function* (tablePrefix, tableName) {
 const Base = require('./base');
 
 class ${ tableString } extends Base {
-  
+
   constructor(options) {
     const opt = Object.assign({
       fields: ${ resStr },
     }, options);
     super('${ tableName }', opt);
   }
-  
+
 }
 
 module.exports = new ${ tableString }();
@@ -69,6 +69,15 @@ module.exports = new ${ tableString }();
     fs.writeFileSync(modelPath, str, 'utf8');
   } else {
     throw new Error(`model ${ tableName } 已经存在`);
+  }
+  fs.writeFileSync(MODELS_PATH + '/' + tableName + '.js', str, 'utf8');
+  const indexPath = MODELS_PATH + '/index.js';
+  const index = fs.readFileSync(indexPath).toString();
+  const nameCamel = utils.underscore2camelCase(tableName);
+  const schemaText = `${ nameCamel }Model: require('./${ tableName }')`;
+  if(index.indexOf(schemaText) === -1) {
+    const indexNew = index.replace('};', `  ${ schemaText },\n};`);
+    fs.writeFileSync(indexPath, indexNew, 'utf8');
   }
 });
 

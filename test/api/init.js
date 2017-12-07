@@ -2,7 +2,7 @@ const app = require('../../src/app');
 const apiService = require('../../src/api');
 
 const util = require('util');
-const debug = require('debug')('api:test');
+const debug = require('debug')('eapi:test');
 
 // TODO: 添加数据库清空重建
 apiService.initTest(app);
