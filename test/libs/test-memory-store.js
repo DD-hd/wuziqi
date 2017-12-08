@@ -2,7 +2,7 @@
 
 const assert = require('chai').assert;
 
-const MemoryStore = require('../../src/lib/cache/memory');
+const MemoryStore = require('../../src/global/libs/cache/memory');
 
 const KEY = 'a';
 const VALUES = [

@@ -82,3 +82,21 @@ exports.createPromiseCallback = function createPromiseCallback() {
   });
   return callback;
 };
+
+/**
+ * 合并对象
+ *
+ * @param {Object} a
+ * @param {Object} b
+ * @return {Object}
+ */
+exports.merge = function merge() {
+  const ret = {};
+  for (let i = 0; i < arguments.length; i++) {
+    const obj = arguments[i];
+    Object.keys(obj).forEach(function (k) {
+      ret[k] = obj[k];
+    });
+  }
+  return ret;
+};

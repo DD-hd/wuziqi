@@ -3,7 +3,7 @@ require('mocha-generators').install();
 
 const assert = require('chai').assert;
 const coroutine = require('express-coroutine').coroutine;
-const MRCache = require('../../src/lib/cache/mrcache');
+const MRCache = require('../../src/global/libs/cache/mrcache');
 
 const KEY = 'mr';
 const VALUES = [

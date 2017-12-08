@@ -3,7 +3,7 @@ require('mocha-generators').install();
 
 const assert = require('chai').assert;
 const coroutine = require('express-coroutine').coroutine;
-const RedisStore = require('../../src/lib/cache/redis');
+const RedisStore = require('../../src/global/libs/cache/redis');
 
 const KEY = 'a';
 const VALUES = [

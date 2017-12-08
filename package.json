@@ -9,7 +9,7 @@
     "docs": "rm -rf ./docs/* && node ./scripts/docs.js",
     "schema": "rm -rf ./src/scheams/*.js && npm run lint",
     "lint": "eslint src config test scripts --fix",
-    "test": "npm run lint && export NODE_ENV=test && mocha test/**/test-*.js",
+    "test": "npm run lint && export NODE_ENV=test && mocha test/**/test-*.js --exit",
     "test-core": "npm run lint && export NODE_ENV=test && mocha test/core/test-*.js",
     "test-libs": "npm run lint && export NODE_ENV=test && mocha test/libs/test-*.js --exit",
     "cover": "export NODE_ENV=test && istanbul cover _mocha test/**/test*.js -- t 60000 && open coverage/lcov-report/index.html",

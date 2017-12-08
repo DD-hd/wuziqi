@@ -131,7 +131,7 @@ const Schema = module.exports = class Schema {
 
   /**
    * 输出结果对象
-   * 
+   *
    * @param {Object} schema 输出结果对象
    * @return {Object}
    */
