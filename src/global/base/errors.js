@@ -30,7 +30,7 @@ function error(name, value) {
   const error = new Error();
   error.code = e.code || -1000;
   error.message = value ? `${ name } : ${ value }` : name;
-  error.msg = value ? `${ e.desc } : ${ value }` : e.desc;
+  error.msg = value || e.desc;
   error.show = e.show || false;
   error.log = e.log || false;
   return error;
