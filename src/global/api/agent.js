@@ -196,7 +196,7 @@ const TestAgent = module.exports = class TestAgent {
       const cb = callback || utils.createPromiseCallback();
       this.output((err, ret) => {
         if (err) {
-          const err2 = new AssertionError(`${ this.key } 期望API输出成功结果，但实际输出失败结果：${ inspect(err) }`);
+          const err2 = new Error(`${ this.key } 期望API输出成功结果，但实际输出失败结果：${ inspect(err) }`);
           cb(err2);
         } else {
           this._saveExample();

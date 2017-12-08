@@ -61,3 +61,24 @@ exports.jsonStringify = function jsonStringify(data, space) {
     return val;
   }, space);
 };
+
+/**
+ * 创建一个带 promise 的回调函数
+ *
+ * @return {Function}
+ */
+exports.createPromiseCallback = function createPromiseCallback() {
+  const callback = (err, ret) => {
+    if (err) {
+      callback.reject(err);
+    } else {
+      callback.resolve(ret);
+    }
+  };
+  // eslint-disable-next-line
+  callback.promise = new Promise((resolve, reject) => {
+    callback.resolve = resolve;
+    callback.reject = reject;
+  });
+  return callback;
+};
