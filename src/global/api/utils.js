@@ -5,7 +5,6 @@
  * @author Yourtion Guo <yourtion@gmail.com>
  */
 const resolvePath = require('path').resolve;
-module.exports = exports = require('lei-utils').extend({});
 
 /**
  * 获取调用当前函数的源码地址
@@ -40,4 +39,25 @@ exports.getCallerSourceLine = function getCallerSourceLine(dir) {
  */
 exports.getSchemaKey = function getSchemaKey(method, path) {
   return `${ method.toUpperCase() }_${ path }`;
+};
+
+/**
+ * 返回安全的JSON字符串
+ *
+ * @param {Object} data
+ * @param {String|Number} space 缩进
+ * @return {String}
+ */
+exports.jsonStringify = function jsonStringify(data, space) {
+  const seen = [];
+  return JSON.stringify(data, function (key, val) {
+    if (!val || typeof val !== 'object') {
+      return val;
+    }
+    if (seen.indexOf(val) !== -1) {
+      return '[Circular]';
+    }
+    seen.push(val);
+    return val;
+  }, space);
 };

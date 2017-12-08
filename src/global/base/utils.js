@@ -4,16 +4,26 @@
  * @file 辅助函数
  * @author Yourtion Guo <yourtion@gmail.com>
  */
+const crypto = require('crypto');
+const url = require('url');
 
 /**
  * leftPad
  */
-exports.leftPad = (n, c) => {
+const leftPad = exports.leftPad = (n, c) => {
   let res = String(n);
   while (res.length < c) {
     res = '0' + res;
   }
   return res;
+};
+
+/**
+ * 生成随机数
+ * @param {Number} num 数量
+ */
+exports.randomString = (num) => {
+  return crypto.randomBytes(num).toString('hex').substr(0, num);
 };
 
 /**
@@ -54,6 +64,13 @@ exports.unixTime = (unixtime) => {
 exports.genTimestamp = (after = 0) => {
   const now = new Date();
   return parseInt(((now.getTime() + after * 1000) / 1000), 10);
+};
+
+/**
+ * 获取时间字符串
+ */
+exports.getDateString = (pad = '', time = new Date()) => {
+  return `${ time.getFullYear() }${ pad }${ leftPad(time.getMonth() + 1, 2) }${ pad }${ leftPad(time.getDate(), 2) }`;
 };
 
 /**
@@ -123,8 +140,6 @@ exports.getErrorSourceFromCo = (err, base = '/src/') => {
   return reaseon;
 };
 
-
-const url = require('url');
 /**
  * 合并URL
  * @param {String} dist 目标URL

@@ -25,7 +25,7 @@ try {
 const SUPPORT_METHOD = [ 'get', 'post', 'put', 'delete', 'patch' ];
 
 /* 输出结果断言错误 */
-const AssertionError = utils.customError('AssertionError', { type: 'api_output_error' });
+const AssertionError = new Error('api_output_error');
 
 /**
  * 返回对象结构字符串

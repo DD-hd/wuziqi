@@ -474,7 +474,7 @@ class Base {
     const that = this;
     return co(function* () {
       if (!name) throw errors.dataBaseError('`name` 不能为空');
-      const tid = utils.randomLetter(6);
+      const tid = utils.randomString(6);
       const debug = that.debugSQL(`Transactions[${ tid }] - ${ name }`);
       const connection = yield mysql.getConnectionAsync();
       connection.debugQuery = (sql) => {
