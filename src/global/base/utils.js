@@ -19,14 +19,6 @@ const leftPad = exports.leftPad = (n, c) => {
 };
 
 /**
- * 生成随机数
- * @param {Number} num 数量
- */
-exports.randomString = (num) => {
-  return crypto.randomBytes(num).toString('hex').substr(0, num);
-};
-
-/**
  * 获取客户端IP
  *
  * @param {Object} req 请求
@@ -45,14 +37,33 @@ exports.getClientIP = function (req) {
  * @return {String}
  */
 exports.unixTime = (unixtime) => {
-  const u = new Date(unixtime * 1000);
+  const u = new Date(unixtime);
   return u.getUTCFullYear() +
-    '-' + ('0' + u.getUTCMonth()).slice(-2) +
-    '-' + ('0' + u.getUTCDate()).slice(-2) +
-    ' ' + ('0' + u.getUTCHours()).slice(-2) +
-    ':' + ('0' + u.getUTCMinutes()).slice(-2) +
-    ':' + ('0' + u.getUTCSeconds()).slice(-2) +
-    '.' + (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5);
+    '-' + leftPad(u.getUTCMonth() + 1, 2) +
+    '-' + leftPad(u.getUTCDate(), 2) +
+    ' ' + leftPad(u.getUTCHours(), 2) +
+    ':' + leftPad(u.getUTCMinutes(), 2) +
+    ':' + leftPad(u.getUTCSeconds() + 1, 2) +
+    '.' + leftPad((u.getUTCMilliseconds() / 1000).toFixed(3), 3);
+};
+
+/**
+ * 时间字符串
+ * @param {Date} date 时间
+ * @return {String}
+ */
+exports.dateString = (date = new Date()) => {
+  return date.getFullYear()
+  + leftPad(date.getMonth() + 1, 2)
+  + leftPad(date.getDate(), 2);
+};
+
+/**
+ * 生成随机数
+ * @param {Number} num 数量
+ */
+exports.randomString = (num) => {
+  return crypto.randomBytes(num).toString('hex').substr(0, num);
 };
 
 /**
@@ -171,4 +182,31 @@ exports.underscore2camelCase = (str) => {
     .replace(/^[_.\- ]+/, '')
     .toLowerCase()
     .replace(/[_.\- ]+(\w|$)/g, (m, p1) => p1.toUpperCase());
+};
+
+/**
+ * 参数检查
+ * @param {Object} data 数据
+ * @param {Array} arr 数据key
+ */
+exports.checkParams = (data, arr) => {
+  for (const val of arr) {
+    if (data[val] === undefined) {
+      return `"${ val }" is required`;
+    }
+  }
+  return false;
+};
+
+/**
+ * 参数提取
+ * @param {Objecy} data 数据
+ * @param {Array} arr 数据key
+ */
+exports.filterParams = function (data, arr) {
+  const obj = {};
+  arr.forEach(key => {
+    if (data[key] !== undefined) obj[key] = data[key];
+  });
+  return obj;
 };
