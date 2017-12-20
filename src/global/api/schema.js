@@ -284,7 +284,7 @@ const Schema = module.exports = class Schema {
   before(...list) {
     this._checkInited();
     for (const name of list) {
-      assert(typeof name === 'string', '钩子名称必须是字符串类型');
+      assert(typeof name === 'function', '钩子名称必须是Function类型');
       this.options.beforeHooks.push(name);
     }
     return this;
@@ -299,7 +299,7 @@ const Schema = module.exports = class Schema {
   after(...list) {
     this._checkInited();
     for (const name of list) {
-      assert(typeof name === 'string', '钩子名称必须是字符串类型');
+      assert(typeof name === 'function', '钩子名称必须是Function类型');
       this.options.afterHooks.push(name);
     }
     return this;
@@ -343,16 +343,6 @@ const Schema = module.exports = class Schema {
           throw new Error(`cannot JSON.stringify(options.params) for param ${ name }`);
         }
       }
-    }
-
-    // 初始化时检查before钩子是否正确
-    for (const name of this.options.beforeHooks) {
-      assert(parent.hook.get(name), `初始化${ this.key }时出错：钩子"${ name }"不存在`);
-    }
-
-    // 初始化时检查after钩子是否正确
-    for (const name of this.options.afterHooks) {
-      assert(parent.hook.get(name), `初始化${ this.key }时出错：钩子"${ name }"不存在`);
     }
 
     this.inited = true;

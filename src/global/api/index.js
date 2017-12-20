@@ -118,9 +118,11 @@ module.exports = class API {
       schema.init(this);
       router[schema.options.method].bind(router)(
         schema.options.path,
+        ...schema.options.beforeHooks,
         params.apiCheckParams(this, schema),
         ...schema.options.middlewares,
-        schema.options.handler
+        schema.options.handler,
+        ...schema.options.afterHooks
       );
     }
   }
