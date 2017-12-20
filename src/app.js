@@ -59,6 +59,13 @@ router.use(function (req, res, next) {
       list: data.list || [],
     });
   };
+  res.file = (filename, filetype, buffer) => {
+    res.type(filetype);
+    res.setHeader('Content-Description', 'File Transfer');
+    res.setHeader('Content-Disposition', `attachment; filename=${ filename }.${ filetype }`);
+    res.setHeader('Content-Length', buffer.length);
+    res.end(buffer);
+  };
   next();
 });
 
