@@ -7,14 +7,16 @@ const Lock = require('../../src/global/libs/lock');
 const { redis } = require('../../src/global');
 
 describe('Libs - Redis Lock', () => {
-  const lock = new Lock(redis, { ttl: 1 });
+  const lock = new Lock(redis, { timeout: 100 });
 
   beforeEach(function* () {
     yield lock.release();
   });
   
   it('Test - Default Lock acquire and release', function* () {
+    assert.isFalse(yield lock.isLocked());
     assert.ok(yield lock.acquire());
+    assert.isTrue(yield lock.isLocked());
     assert.isNull(yield lock.acquire());
     yield lock.release();
     assert.ok(yield lock.acquire());
@@ -30,9 +32,10 @@ describe('Libs - Redis Lock', () => {
   it('Test - Default Lock timeout', function* () {
     assert.ok(yield lock.acquire());
     assert.isNull(yield lock.acquire());
-    yield coroutine.delay(100);
+    yield coroutine.delay(10);
     assert.isNull(yield lock.acquire());
-    yield coroutine.delay(901);
+    yield coroutine.delay(91);
+    assert.isFalse(yield lock.isLocked());
     assert.ok(yield lock.acquire());
   });
 
