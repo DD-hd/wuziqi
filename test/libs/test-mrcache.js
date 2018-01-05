@@ -22,13 +22,14 @@ describe('Libs - MRCache cacheEmpty', () => {
   });
   
   it('Test - simple get set delete', function* () {
+    assert.isUndefined(yield cache.get(KEY));
     assert.isNull(yield cache.get(KEY));
     for(const val of VALUES) {
       yield cache.set(KEY, val);
       assert.deepEqual(yield cache.get(KEY), val);
       assert.deepEqual(yield cache.get(KEY), val);
       yield cache.delete(KEY);
-      assert.isNull(yield cache.get(KEY));
+      assert.isUndefined(yield cache.get(KEY));
     }
   });
 
@@ -40,7 +41,7 @@ describe('Libs - MRCache cacheEmpty', () => {
     assert.deepEqual(yield cache.get(KEY), VAL_OBJ);
     assert.deepEqual(yield cache.get(KEY), VAL_OBJ);
     yield coroutine.delay(1000);
-    assert.isNull(yield cache.get(KEY));
+    assert.isUndefined(yield cache.get(KEY));
   });
 
 });
@@ -53,14 +54,15 @@ describe('Libs - MRCache not cacheEmpty', () => {
   });
     
   it('Test - simple get set delete', function* () {
-    assert.isNull(yield cache.get(KEY));
-    assert.isNull(yield cache.get(KEY));
+    assert.isUndefined(yield cache.get(KEY));
     for(const val of VALUES) {
       yield cache.set(KEY, val);
-      assert.deepEqual(yield cache.get(KEY), val);
-      assert.deepEqual(yield cache.get(KEY), val);
+      if(val !== null) {
+        assert.deepEqual(yield cache.get(KEY), val);
+        assert.deepEqual(yield cache.get(KEY), val);
+      }
       yield cache.delete(KEY);
-      assert.isNull(yield cache.get(KEY));
+      assert.isUndefined(yield cache.get(KEY));
     }
   });
   
@@ -72,7 +74,7 @@ describe('Libs - MRCache not cacheEmpty', () => {
     assert.deepEqual(yield cache.get(KEY), VAL_OBJ);
     assert.deepEqual(yield cache.get(KEY), VAL_OBJ);
     yield coroutine.delay(1000);
-    assert.isNull(yield cache.get(KEY));
+    assert.isUndefined(yield cache.get(KEY));
   });
   
 });
