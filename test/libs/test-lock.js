@@ -15,28 +15,28 @@ describe('Libs - Redis Lock', () => {
   
   it('Test - Default Lock acquire and release', function* () {
     assert.isFalse(yield lock.isLocked());
-    assert.ok(yield lock.acquire());
+    assert.ok(yield lock.get());
     assert.isTrue(yield lock.isLocked());
-    assert.isNull(yield lock.acquire());
+    assert.isNull(yield lock.get());
     yield lock.release();
-    assert.ok(yield lock.acquire());
+    assert.ok(yield lock.get());
   });
 
   it('Test - Default Lock concurrent', function* () {
-    const all = yield Promise.all([lock.acquire(), lock.acquire(), lock.acquire()]);
+    const all = yield Promise.all([lock.get(), lock.get(), lock.get()]);
     assert.equal(all.length, 3);
     const res = all.filter(r => !!r);
     assert.equal(res.length, 1);
   });
 
   it('Test - Default Lock timeout', function* () {
-    assert.ok(yield lock.acquire());
-    assert.isNull(yield lock.acquire());
+    assert.ok(yield lock.get());
+    assert.isNull(yield lock.get());
     yield coroutine.delay(10);
-    assert.isNull(yield lock.acquire());
+    assert.isNull(yield lock.get());
     yield coroutine.delay(91);
     assert.isFalse(yield lock.isLocked());
-    assert.ok(yield lock.acquire());
+    assert.ok(yield lock.get());
   });
 
 });
