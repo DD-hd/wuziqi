@@ -14,6 +14,16 @@ const VALUES = [
 ];
 const VAL_OBJ = VALUES[0];
 
+const fetch = function fetch(d) {
+  // eslint-disable-next-line
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if(d) resolve(new Date() + d);
+      resolve(new Date());
+    }, 10);
+  });
+};
+
 describe('Libs - MRCache cacheEmpty', () => {
   const cache = new MRCache({
     memory: { ttl: 0.1 },
@@ -30,6 +40,35 @@ describe('Libs - MRCache cacheEmpty', () => {
       assert.deepEqual(yield cache.get(KEY), val);
       yield cache.delete(KEY);
       assert.isUndefined(yield cache.get(KEY));
+    }
+  });
+
+  it('Test - ConcurrentGet', function* () {
+    yield cache.delete(KEY);
+    const all = yield Promise.all([cache.get(KEY), cache.get(KEY), cache.get(KEY)]);
+    for(const i of all) {
+      assert.isUndefined(i);
+    }
+    assert.isNull(yield cache.get(KEY));
+  });
+
+  it('Test - GetData', function* () {
+    yield cache.delete(KEY);
+    cache.setData(KEY, fetch);
+    const all = yield Promise.all([cache.getData(KEY), cache.getData(KEY), cache.getData(KEY)]);
+    const i0 = yield cache.getData(KEY);
+    for(const i of all) {
+      assert.equal(i0, i);
+    }
+  });
+
+  it('Test - GetData with params', function* () {
+    yield cache.delete(KEY);
+    cache.setData(KEY, fetch);
+    const all = yield Promise.all([cache.getData(KEY, 666), cache.getData(KEY, 666), cache.getData(KEY, 666)]);
+    const i0 = yield cache.getData(KEY, 666);
+    for(const i of all) {
+      assert.equal(i0, i);
     }
   });
 
@@ -63,6 +102,35 @@ describe('Libs - MRCache not cacheEmpty', () => {
       }
       yield cache.delete(KEY);
       assert.isUndefined(yield cache.get(KEY));
+    }
+  });
+
+  it('Test - ConcurrentGet', function* () {
+    yield cache.delete(KEY);
+    const all = yield Promise.all([cache.get(KEY), cache.get(KEY), cache.get(KEY)]);
+    for(const i of all) {
+      assert.isUndefined(i);
+    }
+    assert.isUndefined(yield cache.get(KEY));
+  });
+
+  it('Test - GetData', function* () {
+    yield cache.delete(KEY);
+    cache.setData(KEY, fetch);
+    const all = yield Promise.all([cache.getData(KEY), cache.getData(KEY), cache.getData(KEY)]);
+    const i0 = yield cache.getData(KEY);
+    for(const i of all) {
+      assert.equal(i0, i);
+    }
+  });
+
+  it('Test - GetData with params', function* () {
+    yield cache.delete(KEY);
+    cache.setData(KEY, fetch);
+    const all = yield Promise.all([cache.getData(KEY, 666), cache.getData(KEY, 666), cache.getData(KEY, 666)]);
+    const i0 = yield cache.getData(KEY, 666);
+    for(const i of all) {
+      assert.equal(i0, i);
     }
   });
   

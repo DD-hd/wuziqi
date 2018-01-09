@@ -28,6 +28,10 @@ class MRCache {
     this.rCache = new RedisStore(redis);
     this._cacheEmpty = cacheEmpty;
     this.emitter = new events.EventEmitter();
+    this.queue = {};
+    this.fnQueue = {};
+    this.fnCache = {};
+    this.fns = {};
   }
   
   /**
@@ -39,13 +43,16 @@ class MRCache {
     const data = this.mCache.get(key);
     debug('mCache:', data);
     if(data !== undefined) return Promise.resolve(data);
-    return this.rCache.get(key).then(res => {
+    if(this.queue[key]) return this.queue[key];
+    this.queue[key] = this.rCache.get(key).then(res => {
       debug('rCache:', res);
       if(res || this._cacheEmpty) {
         this.mCache.set(key, res);
       }
+      delete this.queue[key];
       return res !== null ? res : undefined;
     });
+    return this.queue[key];
   }
   
   /**
@@ -70,11 +77,39 @@ class MRCache {
    * @returns {Promise}
    */
   delete(key) {
-    debug('set:', key);
+    debug('delete:', key);
     this.mCache.delete(key);
     return this.rCache.delete(key);
   }
 
+  setData(key, fn) {
+    this.fns[key] = fn;
+  }
+
+  getData(key, ...args) {
+    const fn = this.fns[key];
+    if(!fn) throw new Error(key + ' is not setData yet');
+    const cacheKey = args.length > 0 ? key + JSON.stringify(args) : key;
+    debug('getData:', key, args, cacheKey);
+    if(!this.fnQueue[cacheKey]) {
+      this.fnQueue[cacheKey] = this.get(cacheKey).then(data => {
+        if(data !== undefined) {
+          delete this.fnQueue[cacheKey];
+          return data;
+        }
+        return fn(...args);
+      }).then(res => {
+        if(!this.fnQueue[cacheKey]) return res;
+        return this.set(cacheKey, res);
+      }).then(res2 => {
+        if(!this.fnQueue[cacheKey]) return res2;
+        delete this.fnQueue[cacheKey];
+        if(!res2) return undefined;
+        return this.get(cacheKey);
+      });
+    }
+    return this.fnQueue[cacheKey];
+  }
 }
 
 module.exports = MRCache;

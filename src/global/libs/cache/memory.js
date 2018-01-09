@@ -29,7 +29,7 @@ class MemoryStore {
     const t = Date.now();
     const info = this.cache[key];
     if (info && info.expire > t) {
-      if(this.immutable)return info.data;
+      if(this.immutable) return info.data;
       return JSON.parse(info.data);
     }
     delete this.cache[key];
