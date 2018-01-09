@@ -41,11 +41,11 @@ class MRCache {
    */
   get(key) {
     const data = this.mCache.get(key);
-    debug('mCache:', data);
+    debug('get mCache:', data);
     if(data !== undefined) return Promise.resolve(data);
     if(this.queue[key]) return this.queue[key];
     this.queue[key] = this.rCache.get(key).then(res => {
-      debug('rCache:', res);
+      debug('get rCache:', res);
       if(res || this._cacheEmpty) {
         this.mCache.set(key, res);
       }
@@ -82,10 +82,21 @@ class MRCache {
     return this.rCache.delete(key);
   }
 
+  /**
+   * 注册通过 fn 获取 key 数据方法
+   * @param {String} key 获取数据Key
+   * @param {Function} fn 获取数据方法
+   */
   setData(key, fn) {
+    debug('setData:', key);
     this.fns[key] = fn;
   }
 
+  /**
+   * 通过注册的 fn 获取数据并缓存
+   * @param {String} key 获取数据Key
+   * @param {Any} args 获取数据参数
+   */
   getData(key, ...args) {
     const fn = this.fns[key];
     if(!fn) throw new Error(key + ' is not setData yet');
