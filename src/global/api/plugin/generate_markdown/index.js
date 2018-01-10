@@ -44,7 +44,7 @@ module.exports = function generateMarkdown(data, dir) {
     fs.writeFileSync(filePath(item.name), titie + trimSpaces(item.content));
   }
   for(const item in data.group) {
-    allInOneDoc.push(`- [${ data.group[item] } ( ${ item.name } ) 相关](#${ item.toLowerCase() })`);
+    allInOneDoc.push(`- [${ data.group[item] } ( ${ item } ) 相关](#${ item.toLowerCase() })`);
     wikiDoc.push(`- [${ data.group[item] } ( ${ item } ) 相关文档](wiki/${ item.toLowerCase() })`);
   }
   fs.writeFileSync(filePath('index'), trimSpaces(indexDoc.join('\n')));
