@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./libs/socket.io.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        var events = {
+            connect: {
+                connect: 'connect',
+                disconnect: 'disconnect'
+            },
+            user: {
+                come: "come",
+                say_one: 'say_to_one',
+                say_all: 'say_to_all',
+                receipt_me: "receipt_me",
+                receipt_all: "receipt_all"
+            },
+            room: {
+                init: "init",
+                user_come: 'user_come',
+                user_leave: 'user_leave'
+            }
+        }
+
+        function pushSocket(socket) {
+            socket.sayToOne = function(to_user_id, msg) {
+                socket.emit(events.user.say_one, {
+                    to_user_id,
+                    msg
+                })
+            }
+            socket.sayToAll = function(msg) {
+                console.log(events)
+                socket.emit(events.user.say_all, {
+                    msg
+                })
+            }
+
+            socket.comeToRoom = function(room_id) {
+                socket.emit(events.user.come, {
+                    room_id
+                })
+            }
+        }
+
+
+        function pullSocket(socket) {
+
+        }
+
+        var socket = io('http://127.0.0.1:3001');
+        pushSocket(socket)
+        pullSocket(socket)
+    </script>
+</head>
+
+<body>
+    <h1>hello socket.io</h1>
+    <div>
+        <span>用户名:</span><input type="text" name="username" id="username" label="">
+        <span>密码:</span><input type="text" name="password" id="password" label="">
+        <button onclick="register()">注册</button>
+        <button onclick="sendData()">登陆</button>
+        <button onclick="testLogin()">测试登陆</button>
+    </div>
+    <div>
+        <span>房间号:</span><input type="text" id="room" label="">
+        <button id="leave">离开</button>
+        <button id="join">加入</button>
+    </div>
+    <div>
+        <div style="height:300px;width:600px;background-color:bisque;overflow:auto;float:left;" id="content">
+        </div>
+        <div style="height:300px;width:180px;background-color:aquamarine;float:left;" id="user_list"></div>
+    </div>
+
+    <div style="clear:both">
+        <span>输入内容:</span><input type="text" id="msg">
+        <button id="sayOne">SayOne</button>
+        <button id="sayAll">SayAll</button>
+    </div>
+</body>
+
+<script>
+    const msg = document.querySelector("#msg")
+    const sayOne = document.querySelector("#sayOne")
+    const sayAll = document.querySelector("#sayAll")
+    const content = document.querySelector("#content")
+    const userList = document.querySelector("#user_list")
+    var username = document.querySelector('#username')
+    var password = document.querySelector('#password')
+
+    function register() {
+        $.ajax({
+            url: "/users/register",
+            type: 'POST',
+            data: {
+                "username": username.value,
+                "password": password.value
+            },
+            contentType: "application/json",
+            dataType: "json",
+            success: function(res) {
+                console.log(res)
+            }
+        })
+    }
+
+    function sendData() {
+        $.ajax({
+            url: "/users/login",
+            type: 'POST',
+            data: {
+                "username": username.value,
+                "password": password.value
+            },
+            contentType: "application/json",
+            success: function(res) {
+                console.log(res)
+            }
+        })
+    }
+
+    function testLogin() {
+        $.ajax({
+            url: "/users/login/test",
+            success: function(res) {
+                alert(res)
+            }
+        })
+    }
+
+    function addContent(from_id, msg, type) {
+        const ele = document.createElement('div')
+        const color = type == 'all' ? "#0000FF" : "#00FF00"
+        ele.innerHTML = '<p style="color:' + color + 'FF00FF">' + from_id + '  :  ' + msg + '</p>'
+        content.appendChild(ele)
+    }
+
+    sayOne.addEventListener('click', function() {
+        const text = msg.value;
+        socket.sayToOne(1, text)
+    })
+
+    sayAll.addEventListener('click', function() {
+        const text = msg.value;
+        socket.sayToAll(text)
+    })
+
+    socket.on(events.connect.connect, function() {
+        const room_id = 1
+        socket.comeToRoom(room_id)
+        console.log("接入成功")
+    });
+
+    socket.on(events.user.receipt_one, function(data) {
+        const {
+            from_id,
+            msg
+        } = data
+        addContent(from_id, msg, 'one')
+    });
+
+    socket.on(events.user.receipt_all, function(data) {
+        const {
+            from_id,
+            msg
+        } = data
+        console.log(events.user.receipt_all, msg)
+        addContent(from_id, msg, 'all')
+    });
+
+
+    socket.on(events.room.user_come, function(data) {
+        const {
+            user_id
+        } = data
+        console.log(events.room.user_come, user_id)
+    })
+
+    socket.on(events.room.user_leave, function(data) {
+        const {
+            user_id
+        } = data
+        console.log(events.room.user_leave, user_id)
+    })
+
+    socket.on(events.room.user_leave, function(data) {
+        const {
+            user_id
+        } = data
+        console.log(events.room.user_leave, user_id)
+    })
+</script>
+
+</html>

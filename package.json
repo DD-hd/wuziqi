@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "export NODE_ENV=production && node src/index.js",
-    "dev": "export NODE_ENV=dev && nodemon --watch src src/index.js",
+    "dev": "set NODE_ENV=dev&& nodemon --watch src src/index.js",
     "docs": "rm -rf ./docs/* && node ./scripts/docs.js",
     "schema": "rm -rf ./src/scheams/*.js && npm run lint",
     "lint": "eslint src config test scripts --fix",
@@ -31,6 +31,8 @@
     "log4js": "^2.4.1",
     "mysql": "^2.15.0",
     "path-to-regexp": "^2.1.0",
+    "socket.io": "^2.0.4",
+    "socket.io-cookie-parser": "^1.0.0",
     "squel": "^5.12.0",
     "validator": "^9.2.0"
   },
