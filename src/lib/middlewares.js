@@ -6,21 +6,13 @@
  */
 
 const { config, redis, log4js } = require('../global');
-const { session, getSession, getCookie } = require('./session')
+const { session } = require('./session')
 const logger = log4js.getLogger();
 
 exports.session = session
-exports.getSession = getSession
-exports.getCookie = getCookie
 exports.socketCookieParser = require('socket.io-cookie-parser')
-exports.authSocket = (socket, next) => {
-    getSession(socket.client.request).then(session => {
-        if (!session || !session.user) {
-            // socket.disconnect(true)
-            return next(new Error('Not a doge error'))
-        }
-        next()
-    })
+exports.socketSession = (socket, next) => {
+    session(socket.request, socket.request.res, next)
 }
 
 

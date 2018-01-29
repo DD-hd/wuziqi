@@ -1,5 +1,5 @@
-const { socketCookieParser, store, authSocket, getSession } = require('./lib/middlewares')
-const roomHandle = require('./handles/roomHandle')
+const { socketCookieParser, store, socketSession } = require('./lib/middlewares')
+const aiHandle = require('./handles/aiHandle')
 
 module.exports = (server) => {
     const io = require('socket.io')(server, {
@@ -8,7 +8,7 @@ module.exports = (server) => {
         cookie: true
     })
     io.use(socketCookieParser());
-    io.use(authSocket)
+    io.use(socketSession)
     io.on('connection', function(socket) {
         // store.get(socket.request.cookies['connect.sid'], (err) => {
         //     console.log(err)
@@ -24,6 +24,6 @@ module.exports = (server) => {
         // console.log('cookies', getSession(socket.request).then((res) => {
         //     console.log(res)
         // }))
-        roomHandle(io, socket)
+        aiHandle(io, socket)
     });
 }
