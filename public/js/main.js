@@ -29,7 +29,7 @@ var Board = function(container, status) {
     //     self.lock = false;
     //     self.setStatus("电脑下子(" + e.data[0] + "," + e.data[1] + "), 用时" + ((new Date() - self.time) / 1000) + "秒");
     // }
-    this.io = io('http://127.0.0.1:3001');
+    this.io = io('http://119.29.250.87:3001');
     this.io.on("error", function(error) {
         alert(error)
     })
