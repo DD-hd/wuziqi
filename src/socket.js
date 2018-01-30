@@ -1,4 +1,4 @@
-const { socketCookieParser, store, socketSession } = require('./lib/middlewares')
+const { socketCookieParser, store, socketSession, socketHelper } = require('./lib/middlewares')
 const aiHandle = require('./handles/aiHandle')
 
 module.exports = (server) => {
@@ -9,21 +9,29 @@ module.exports = (server) => {
     })
     io.use(socketCookieParser());
     io.use(socketSession)
+    io.use(socketHelper)
     io.on('connection', function(socket) {
-        // store.get(socket.request.cookies['connect.sid'], (err) => {
-        //     console.log(err)
-        // })
-        // socket.use((packet, next) => {
-        //     console.log(packet)
-        //     console.log("123")
-        //     socket.disconnect(true)
-        //     if (packet.doge === true) return next();
-        //     next(new Error('Not a doge error'));
-        // });
+        console.log(socket.client.request.sessionID, socket.id, socket.rooms)
+            // store.get(socket.request.cookies['connect.sid'], (err) => {
+            //     console.log(err)
+            // })
+            // socket.use((packet, next) => {
+            //     console.log(packet)
+            //     console.log("123")
+            //     socket.disconnect(true)
+            //     if (packet.doge === true) return next();
+            //     next(new Error('Not a doge error'));
+            // });
 
         // console.log('cookies', getSession(socket.request).then((res) => {
         //     console.log(res)
         // }))
-        aiHandle(io, socket)
+
+        // socket.join(12, () => {
+        //     let rooms = Object.keys(socket.rooms);
+        //     console.log(socket.rooms, rooms);
+        // })
+
+        // aiHandle(io, socket)
     });
 }

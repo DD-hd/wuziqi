@@ -25,9 +25,9 @@ Board.prototype.init = function(sizeOrBoard) {
             }
             this.board.push(row);
         }
-        this.board[7][7] = R.com;
-        this.steps.push([7, 7]);
-        this.zobrist.go(7, 7, R.com);
+        // this.board[7][7] = R.com;
+        // this.steps.push([7, 7]);
+        // this.zobrist.go(7, 7, R.com);
     }
 
 
@@ -154,6 +154,7 @@ Board.prototype.back = function() {
     this.zobrist.go(s[0], s[1], this.board[s[0]][s[1]]);
     this.board[s[0]][s[1]] = R.empty;
     this.updateScore(s);
+    return s
 }
 
 //棋面估分
@@ -267,6 +268,10 @@ Board.prototype.gen = function() {
     return result;
 }
 
-var board = new Board();
+Board.prototype.getAllStep = () => {
+    return this.steps()
+}
 
-module.exports = board;
+// var board = new Board();
+
+module.exports = Board;

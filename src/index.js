@@ -21,7 +21,7 @@ server.listen(PORT, HOST, function() {
 
 process.on('uncaughtException', function(err) {
     // eslint-disable-next-line no-console
-    console.log((err && err.stack) || err);
+    console.log('uncaughtException', (err && err.stack) || err);
     process.exit(-1);
 });
 

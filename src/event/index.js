@@ -1,25 +1,27 @@
 const event = {
-    connect: {
+    basic: {
         connect: 'connect',
-        disconnect: 'disconnect'
+        disconnect: 'disconnect',
+        fail: "fail",
+        success: "success"
     },
-    user: {
-        come: "come",
-        say_one: 'say_to_one',
-        say_all: 'say_to_all',
-        receipt_me: "receipt_me",
-        receipt_all: "receipt_all"
-    },
-    room: {
-        init: "init",
-        user_come: 'user_come',
-        user_leave: 'user_leave'
-    },
+
     wuzi: {
-        start: "start",
-        go: "go",
-        back: "back",
-        finish: "finish"
+        init: "init",
+        restore: "restore",
+        other_come: "self_ready",
+        computer: {
+            start: "computer:start",
+            go: "computer:go",
+            back: "computer:back",
+            finish: "computer:finish"
+        },
+        human: {
+            start: "human:start",
+            go: "human:go",
+            back: "human:back",
+            finish: "human:finish"
+        }
     }
 }
 

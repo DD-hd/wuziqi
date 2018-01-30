@@ -8,7 +8,7 @@ var Board = function(container, status) {
     this.step = this.container.width() * 0.065;
     this.offset = this.container.width() * 0.044;
     this.steps = []; //存储
-
+    this.domain = "http://127.0.0.1:3001"
     this.started = false;
 
 
@@ -29,9 +29,9 @@ var Board = function(container, status) {
     //     self.lock = false;
     //     self.setStatus("电脑下子(" + e.data[0] + "," + e.data[1] + "), 用时" + ((new Date() - self.time) / 1000) + "秒");
     // }
-    this.io = io('http://127.0.0.1:3001');
+    this.io = io(this.domain);
     this.io.on("error", function(error) {
-        alert(error)
+        console.log("服务端错误", error)
     })
     this.io.on(EVENT.wuzi.go, function(data) {
         self._set(data[0], data[1], R.com);

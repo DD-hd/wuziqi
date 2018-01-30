@@ -8,9 +8,16 @@
 const { config, redis, log4js } = require('../global');
 const { session } = require('./session')
 const logger = log4js.getLogger();
+const event = require('../event')
 
 exports.session = session
 exports.socketCookieParser = require('socket.io-cookie-parser')
+
+exports.socketHelper = (socket, next) => {
+    socket.fail = (error, event_type) => socket.emit(event_type || event.basic.fail, error)
+    next()
+
+}
 exports.socketSession = (socket, next) => {
     session(socket.request, socket.request.res, next)
 }
