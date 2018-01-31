@@ -15,7 +15,7 @@ const base = {
     authCodeLength: 4,
     authCodeMaxAge: 300,
     saltRounds: 10, // 密码加盐长度
-    logger_debug: true,
+    loggerDebug: true,
     redisKey: 'api',
     debug: true,
     message: {
