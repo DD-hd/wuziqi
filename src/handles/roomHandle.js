@@ -17,8 +17,8 @@ function getRoomInfoByType(type) {
 }
 
 module.exports = (io, socket) => {
-
-    if (socket.request.session.$user) {
+    // console.log(socket.request)
+    if (socket.request.session && socket.request.session.$user) {
         const { room_id, user_id, role } = socket.request.session.$user
         socket.join(room_id)
     }

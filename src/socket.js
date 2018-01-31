@@ -9,7 +9,7 @@ module.exports = (server) => {
     })
 
     io.use(socketCookieParser());
-    // io.use(socketSession)
+    io.use(socketSession)
     io.use(socketHelper)
     let i = 1;
     io.on('connection', function(socket) {

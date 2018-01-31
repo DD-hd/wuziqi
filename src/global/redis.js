@@ -11,13 +11,17 @@ const config = require('../../config');
 const logger = log4js.getLogger('redis');
 
 Redis.Promise.onPossiblyUnhandledRejection((error) => {
-  logger.error(error);
+    logger.error(error);
 });
 
 const redis = new Redis(config.redis);
 
 redis.on('connect', () => {
-  logger.debug('Redis connected');
+    logger.debug('Redis connected');
 });
 
+redis.on("error", (err) => {
+    console.log(err)
+    logger.error(err)
+})
 module.exports = redis;
