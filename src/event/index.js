@@ -10,18 +10,10 @@ const event = {
         init: "init",
         restore: "restore",
         other_come: "self_ready",
-        computer: {
-            start: "computer:start",
-            go: "computer:go",
-            back: "computer:back",
-            finish: "computer:finish"
-        },
-        human: {
-            start: "human:start",
-            go: "human:go",
-            back: "human:back",
-            finish: "human:finish"
-        }
+        start: "start",
+        go: "go",
+        back: "back",
+        finish: "finish"
     }
 }
 

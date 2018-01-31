@@ -10,8 +10,9 @@ var Board = function(container, status) {
     this.steps = []; //存储
     this.domain = "http://127.0.0.1:3001"
     this.started = false;
-
-
+    this.role = 1;
+    this.roleMsg = "电脑"
+    this.prePutTime = new Date().getTime()
     var self = this;
     this.container.on("click", function(e) {
         if (self.lock || !self.started) return;
@@ -20,7 +21,7 @@ var Board = function(container, status) {
         x = Math.floor((x + self.offset) / self.step) - 1;
         y = Math.floor((y + self.offset) / self.step) - 1;
 
-        self.set(x, y, 1);
+        self.set(x, y, self.role);
     });
 
     // this.worker = new Worker("./dist/bridge.js?r=" + (+new Date()));
@@ -34,35 +35,86 @@ var Board = function(container, status) {
         console.log("服务端错误", error)
     })
     this.io.on(EVENT.wuzi.go, function(data) {
-        self._set(data[0], data[1], R.com);
+        const type = self.role == R.com ? R.hum : R.com
+        self._set(data[0], data[1], type);
         self.lock = false;
-        self.setStatus("电脑下子(" + data[0] + "," + data[1] + "), 用时" + ((new Date() - self.time) / 1000) + "秒");
+        self.setStatus(self.roleMsg + "下子(" + data[0] + "," + data[1] + "), 用时" + ((new Date().getTime() - self.prePutTime) / 1000) + "秒");
     })
+
+    this.io.on(EVENT.wuzi.restore, function(result) {
+        var chessList = result.data.chessList
+        var player = result.data.player
+        var should_play_role = result.data.should_play_role
+        for (var p of chessList) {
+            const { x, y, role } = p
+            const type = role == 1 ? R.com : R.hum
+            const myRole = player == 1 ? R.com : R.hum
+            self.role = myRole
+            self._set(x, y, type);
+            if (should_play_role == player) {
+                self.lock = false;
+                self.setStatus("欢迎加入五子棋游戏");
+            } else {
+                self.setStatus("等待其他人下棋")
+            }
+        }
+    })
+
     this.setStatus("请点击开始按钮");
 
 }
 
 Board.prototype.start = function() {
 
-    if (this.started) return;
+    if (this.started) {
+        alert("你已经开始游戏")
+        return;
+    }
     this.initBoard();
 
-    this.board[7][7] = R.com;
-    this.steps.push([7, 7]);
+    // this.board[7][7] = R.com;
+    // this.steps.push([7, 7]);
 
-    this.draw();
+    // this.draw();
 
     this.setStatus("欢迎加入五子棋游戏");
 
     this.started = true;
+    this.io.emit(EVENT.wuzi.init, { type: "computer" });
+}
 
-    this.io.emit(EVENT.wuzi.start);
+Board.prototype.humanStart = function() {
+    if (this.started) {
+        alert("你已经开始游戏")
+        return;
+    }
+    var self = this
+    this.initBoard();
+
+    this.started = true;
+    this.roleMsg = "其他人"
+    this.io.emit(EVENT.wuzi.init, { type: "human" });
+    this.io.on(EVENT.wuzi.init, (data) => {
+        const { role, status } = data
+        self.role = role == 1 ? R.com : R.hum
+        if (status == "start") {
+            this.lock = false
+            this.setStatus("欢迎加入五子棋游戏")
+        }
+    })
+    this.lock = true
+    this.setStatus("等待其他人加入");
+    this.io.on(EVENT.wuzi.other_come, (data) => {
+        this.lock = false
+        this.setStatus("欢迎加入五子棋游戏")
+    })
 }
 
 Board.prototype.stop = function() {
     if (!this.started) return;
     this.setStatus("请点击开始按钮");
     this.started = false;
+    this.io.emit(EVENT.wuzi.finish)
 }
 Board.prototype.initBoard = function() {
     this.board = [];
@@ -111,16 +163,21 @@ Board.prototype._set = function(x, y, role) {
     var self = this;
     if (winner == R.com || winner == R.hum) {
         this.io.emit(EVENT.wuzi.finish)
+        if (winner != self.role) {
+            $.alert(this.roleMsg + "赢了！", function() {
+                self.stop();
+            });
+        } else if (winner == self.role) {
+            $.alert("恭喜你赢了！", function() {
+                self.stop();
+            });
+        }
     }
-    if (winner == R.com) {
-        $.alert("电脑赢了！", function() {
-            self.stop();
-        });
-    } else if (winner == R.hum) {
-        $.alert("恭喜你赢了！", function() {
-            self.stop();
-        });
-    }
+
+
+
+
+    return winner
 }
 
 Board.prototype.set = function(x, y, role) {
@@ -128,10 +185,13 @@ Board.prototype.set = function(x, y, role) {
     if (this.board[x][y] !== 0) {
         throw new Error("此位置不为空");
     }
+    this.prePutTime = new Date().getTime()
 
     // console.log(x, y, role)
-    this._set(x, y, role);
     this.com(x, y, role);
+    var winner = this._set(x, y, role);
+
+
 }
 
 Board.prototype.com = function(x, y, role) {
@@ -141,7 +201,7 @@ Board.prototype.com = function(x, y, role) {
         x: x,
         y: y
     });
-    this.setStatus("电脑正在思考...");
+    this.setStatus(this.roleMsg + "正在思考，请稍等..");
 }
 
 Board.prototype.setStatus = function(s) {
@@ -150,25 +210,34 @@ Board.prototype.setStatus = function(s) {
 
 Board.prototype.back = function(step) {
     if (this.lock) {
-        this.setStatus("电脑正在思考，请稍等..");
+        this.setStatus(this.roleMsg + "正在思考，请稍等..");
         return;
     }
     step = step || 1;
+    var humanS = null
     while (step && this.steps.length >= 2) {
         var s = this.steps.pop();
         this.board[s[0]][s[1]] = R.empty;
         s = this.steps.pop();
+        humanS = s;
         this.board[s[0]][s[1]] = R.empty;
         step--;
     }
     this.draw();
-    this.io.emit(EVENT.wuzi.back);
+    if (humanS) {
+        this.io.emit(EVENT.wuzi.back, { x: humanS[0], y: humanS[1] });
+    }
+
 }
 
 
 var b = new Board($("#board"), $(".status"));
 $("#start").click(function() {
     b.start();
+});
+
+$("#human").click(function() {
+    b.humanStart();
 });
 
 $("#fail").click(function() {

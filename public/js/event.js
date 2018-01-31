@@ -1,21 +1,15 @@
 var EVENT = {
-    connect: {
+    basic: {
         connect: 'connect',
-        disconnect: 'disconnect'
+        disconnect: 'disconnect',
+        fail: "fail",
+        success: "success"
     },
-    user: {
-        come: "come",
-        say_one: 'say_to_one',
-        say_all: 'say_to_all',
-        receipt_me: "receipt_me",
-        receipt_all: "receipt_all"
-    },
-    room: {
-        init: "init",
-        user_come: 'user_come',
-        user_leave: 'user_leave'
-    },
+
     wuzi: {
+        init: "init",
+        restore: "restore",
+        other_come: "self_ready",
         start: "start",
         go: "go",
         back: "back",

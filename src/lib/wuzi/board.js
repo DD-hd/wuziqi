@@ -25,6 +25,7 @@ Board.prototype.init = function(sizeOrBoard) {
             }
             this.board.push(row);
         }
+
         // this.board[7][7] = R.com;
         // this.steps.push([7, 7]);
         // this.zobrist.go(7, 7, R.com);
@@ -69,10 +70,12 @@ Board.prototype.initScore = function() {
 
 //只更新一个点附近的分数
 Board.prototype.updateScore = function(p) {
+
     var radius = 8,
         board = this.board,
         self = this,
         len = this.board.length;
+    // console.log(self.comScore)
 
     function update(x, y) {
         var cs = scorePoint(board, [x, y], R.com);
@@ -133,6 +136,7 @@ Board.prototype.put = function(p, role, record) {
     this.zobrist.go(p[0], p[1], role);
     this.updateScore(p);
     if (record) this.steps.push(p);
+
 }
 
 //移除棋子

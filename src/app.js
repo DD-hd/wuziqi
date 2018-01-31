@@ -9,7 +9,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const router = new express.Router();
 
-const { log4js, errors, config } = require('./global');
+const { log4js, errors, config, utils } = require('./global');
 const { middlewares } = require('./lib');
 const logger = log4js.getLogger();
 
@@ -18,8 +18,18 @@ const api = apiService.api;
 
 // Session
 app.use(middlewares.session);
+
+app.use('*', (req, res, next) => {
+    if (!req.session.$flag) {
+        req.session.$flag = utils.randomString(6)
+    }
+    next()
+})
+
 // 静态文件
 app.use('/public', express.static('public'));
+
+
 
 // Log4j express 路由
 router.use(log4js.connectLogger(log4js.getLogger('express'), {

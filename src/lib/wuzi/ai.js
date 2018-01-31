@@ -25,17 +25,12 @@ AI.prototype.back = function() {
     return this.board.back();
 }
 
-AI.prototype.restore = function(comList, humList) {
-    for (let comP of comList) {
-        const { x, y } = comP
-        this.board.put([x, y], R.com)
+AI.prototype.restore = function(chessList, human_type) {
+    for (let comP of chessList) {
+        const { x, y, role } = comP
+        const type = human_type == role ? R.hum : R.com
+        this.board.put([x, y], type, true)
     }
-
-    for (let humP of humList) {
-        const { x, y } = comP
-        this.board.put([x, y], R.hum)
-    }
-
 }
 
 module.exports = AI;

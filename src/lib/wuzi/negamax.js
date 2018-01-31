@@ -140,9 +140,15 @@ function initOperation(board) {
         //迭代加深
         //注意这里不要比较分数的大小，因为深度越低算出来的分数越不靠谱，所以不能比较大小，而是是最高层的搜索分数为准
         var result;
+
         for (var i = 2; i <= deep; i += 2) {
             result = maxmin(i);
             if (math.greatOrEqualThan(result.score, SCORE.FOUR)) return result;
+
+            // console.log("comScore", board.comScore)
+            // console.log("humScore", board.humScore)
+            // console.log("steps", board.steps)
+
         }
         return result;
     }

@@ -5,27 +5,39 @@ const aiList = {}
 
 class AiService {
     constructor(id) {
+        // console.log(aiList, aiList[id], "命中")
         let ai = aiList[id]
         if (!aiList[id]) {
             ai = new AI()
+            aiList[id] = ai
+            ai.start(15)
         }
+        this.id = id
         this.ai = ai
+
     }
-    start() {
-        this.ai.start(15);
-    }
+
+
     go(x, y) {
         var p = this.ai.set(x, y);
         return p
     }
+
     back() {
         return this.ai.back();
     }
+
     finish() {
         delete aiList[id]
     }
-    restore(chessList) {
-        return this.ai.restore(comList, humList)
+
+    restore(chessList, human_type) {
+        this.ai.start(15)
+        return this.ai.restore(chessList, human_type)
+    }
+
+    destroy() {
+        delete aiList[this.id]
     }
 }
 
