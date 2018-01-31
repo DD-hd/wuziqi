@@ -64,4 +64,5 @@ static
 config/production.js
 docs
 .idea
+dump.rdb
 src/newrelic.js
