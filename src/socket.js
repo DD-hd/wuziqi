@@ -1,5 +1,6 @@
 const { socketCookieParser, store, socketSession, socketHelper } = require('./lib/middlewares')
 const roomHandle = require('./handles/roomHandle')
+const wrapSocket = require('./lib/wrapSocket')
 
 module.exports = (server) => {
     const io = require('socket.io')(server, {
@@ -7,14 +8,21 @@ module.exports = (server) => {
         pingTimeout: 5000,
         cookie: true
     })
-
+    wrapSocket(io)
     io.use(socketCookieParser());
     io.use(socketSession)
     io.use(socketHelper)
-    let i = 1;
     io.on('connection', function(socket) {
+        wrapSocket(socket)
         socketSession(socket, () => {
             roomHandle(io, socket)
         })
+        socket.on("errorHandle", (err) => {
+            console.log("socket:errorHandle", err)
+        })
     });
+
+    io.on("errorHandle", (err) => {
+        console.log("io:errorHandle", err)
+    })
 }

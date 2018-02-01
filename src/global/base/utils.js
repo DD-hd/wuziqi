@@ -11,11 +11,11 @@ const url = require('url');
  * leftPad
  */
 const leftPad = exports.leftPad = (n, c) => {
-  let res = String(n);
-  while (res.length < c) {
-    res = '0' + res;
-  }
-  return res;
+    let res = String(n);
+    while (res.length < c) {
+        res = '0' + res;
+    }
+    return res;
 };
 
 /**
@@ -24,11 +24,11 @@ const leftPad = exports.leftPad = (n, c) => {
  * @param {Object} req 请求
  * @returns {String} ip
  */
-exports.getClientIP = function (req) {
-  const ip = req.headers['x-real-ip']
-    || req.headers['x-forwarded-for']
-    || req.ip;
-  return ip.match(/\d+\.\d+\.\d+\.\d+/)[0];
+exports.getClientIP = function(req) {
+    const ip = req.headers['x-real-ip'] ||
+        req.headers['x-forwarded-for'] ||
+        req.ip;
+    return ip.match(/\d+\.\d+\.\d+\.\d+/)[0];
 };
 
 /**
@@ -37,14 +37,14 @@ exports.getClientIP = function (req) {
  * @return {String}
  */
 exports.unixTime = (unixtime) => {
-  const u = new Date(unixtime);
-  return u.getUTCFullYear() +
-    '-' + leftPad(u.getUTCMonth() + 1, 2) +
-    '-' + leftPad(u.getUTCDate(), 2) +
-    ' ' + leftPad(u.getUTCHours(), 2) +
-    ':' + leftPad(u.getUTCMinutes(), 2) +
-    ':' + leftPad(u.getUTCSeconds() + 1, 2) +
-    '.' + leftPad((u.getUTCMilliseconds() / 1000).toFixed(3), 3);
+    const u = new Date(unixtime);
+    return u.getUTCFullYear() +
+        '-' + leftPad(u.getUTCMonth() + 1, 2) +
+        '-' + leftPad(u.getUTCDate(), 2) +
+        ' ' + leftPad(u.getUTCHours(), 2) +
+        ':' + leftPad(u.getUTCMinutes(), 2) +
+        ':' + leftPad(u.getUTCSeconds() + 1, 2) +
+        '.' + leftPad((u.getUTCMilliseconds() / 1000).toFixed(3), 3);
 };
 
 /**
@@ -53,9 +53,9 @@ exports.unixTime = (unixtime) => {
  * @return {String}
  */
 exports.dateString = (date = new Date()) => {
-  return date.getFullYear()
-  + leftPad(date.getMonth() + 1, 2)
-  + leftPad(date.getDate(), 2);
+    return date.getFullYear() +
+        leftPad(date.getMonth() + 1, 2) +
+        leftPad(date.getDate(), 2);
 };
 
 /**
@@ -63,7 +63,7 @@ exports.dateString = (date = new Date()) => {
  * @param {Number} num 数量
  */
 exports.randomString = (num) => {
-  return crypto.randomBytes(num).toString('hex').substr(0, num);
+    return crypto.randomBytes(num).toString('hex').substr(0, num);
 };
 
 /**
@@ -73,15 +73,15 @@ exports.randomString = (num) => {
  * @returns {Number}
  */
 exports.genTimestamp = (after = 0) => {
-  const now = new Date();
-  return parseInt(((now.getTime() + after * 1000) / 1000), 10);
+    const now = new Date();
+    return parseInt(((now.getTime() + after * 1000) / 1000), 10);
 };
 
 /**
  * 获取时间字符串
  */
 exports.getDateString = (pad = '', time = new Date()) => {
-  return `${ time.getFullYear() }${ pad }${ leftPad(time.getMonth() + 1, 2) }${ pad }${ leftPad(time.getDate(), 2) }`;
+    return `${ time.getFullYear() }${ pad }${ leftPad(time.getMonth() + 1, 2) }${ pad }${ leftPad(time.getDate(), 2) }`;
 };
 
 /**
@@ -92,21 +92,21 @@ exports.getDateString = (pad = '', time = new Date()) => {
  * @returns {Boolean}
  */
 exports.parseQueryBoolean = (query, b) => {
-  const str = String(query);
-  if (str === '1' || str === 'true' || str === 'yes' || str === 'on') {
-    return true;
-  } else if (str === '0' || str === 'false' || str === 'no' || str === 'off') {
-    return false;
-  }
-  return b;
+    const str = String(query);
+    if (str === '1' || str === 'true' || str === 'yes' || str === 'on') {
+        return true;
+    } else if (str === '0' || str === 'false' || str === 'no' || str === 'off') {
+        return false;
+    }
+    return b;
 };
 
 /**
  * 删除对象中的 undefined
  */
 exports.removeUndefined = (object) => {
-  Object.keys(object).forEach(key => object[key] === undefined && delete object[key]);
-  return object;
+    Object.keys(object).forEach(key => object[key] === undefined && delete object[key]);
+    return object;
 };
 
 /**
@@ -120,17 +120,17 @@ exports.removeUndefined = (object) => {
  * @returns {Array}
  */
 exports.mergeInfo = (array, object, k1, k2, prefix) => {
-  array.map(a => {
-    if(a[k1] === object[a[k1]][k2]) {
-      const obj = object[a[k1]];
-      Object.keys(obj).forEach(k => {
-        a[prefix + '_' + k] = obj[k];
-        if(k === 'thumbnail') a[k] = obj[k];
-      });
-    }
-    return a[k1];
-  });
-  return array;
+    array.map(a => {
+        if (a[k1] === object[a[k1]][k2]) {
+            const obj = object[a[k1]];
+            Object.keys(obj).forEach(k => {
+                a[prefix + '_' + k] = obj[k];
+                if (k === 'thumbnail') a[k] = obj[k];
+            });
+        }
+        return a[k1];
+    });
+    return array;
 };
 
 /**
@@ -140,15 +140,15 @@ exports.mergeInfo = (array, object, k1, k2, prefix) => {
  * @return {Array}
  */
 exports.getErrorSourceFromCo = (err, base = '/src/') => {
-  const reaseon = [];
-  if(err.stack) {
-    for(const line of err.stack.split('\n')) {
-      if(line.indexOf(base) !== -1) {
-        reaseon.push(line.trim().replace('at ', ''));
-      }
+    const reaseon = [];
+    if (err.stack) {
+        for (const line of err.stack.split('\n')) {
+            if (line.indexOf(base) !== -1) {
+                reaseon.push(line.trim().replace('at ', ''));
+            }
+        }
     }
-  }
-  return reaseon;
+    return reaseon;
 };
 
 /**
@@ -158,11 +158,11 @@ exports.getErrorSourceFromCo = (err, base = '/src/') => {
  * @param {String} hash hash 参数
  */
 exports.mergeUrl = (dist, query, hash) => {
-  const distUrl = url.parse(dist, true);
-  delete distUrl.search;
-  Object.assign(distUrl.query, query);
-  distUrl.hash = hash;
-  return url.format(distUrl);
+    const distUrl = url.parse(dist, true);
+    delete distUrl.search;
+    Object.assign(distUrl.query, query);
+    distUrl.hash = hash;
+    return url.format(distUrl);
 };
 
 /**
@@ -170,7 +170,7 @@ exports.mergeUrl = (dist, query, hash) => {
  * @param {String} str 输入字符串
  */
 exports.firstUpperCase = (str) => {
-  return str.replace(/^\S/, (s) => { return s.toUpperCase(); });
+    return str.replace(/^\S/, (s) => { return s.toUpperCase(); });
 };
 
 /**
@@ -178,10 +178,10 @@ exports.firstUpperCase = (str) => {
  * @param {String} str 输入字符串
  */
 exports.underscore2camelCase = (str) => {
-  return str
-    .replace(/^[_.\- ]+/, '')
-    .toLowerCase()
-    .replace(/[_.\- ]+(\w|$)/g, (m, p1) => p1.toUpperCase());
+    return str
+        .replace(/^[_.\- ]+/, '')
+        .toLowerCase()
+        .replace(/[_.\- ]+(\w|$)/g, (m, p1) => p1.toUpperCase());
 };
 
 /**
@@ -190,12 +190,12 @@ exports.underscore2camelCase = (str) => {
  * @param {Array} arr 数据key
  */
 exports.checkParams = (data, arr) => {
-  for (const val of arr) {
-    if (data[val] === undefined) {
-      return `"${ val }" is required`;
+    for (const val of arr) {
+        if (data[val] === undefined) {
+            return `"${ val }" is required`;
+        }
     }
-  }
-  return false;
+    return false;
 };
 
 /**
@@ -203,10 +203,18 @@ exports.checkParams = (data, arr) => {
  * @param {Objecy} data 数据
  * @param {Array} arr 数据key
  */
-exports.filterParams = function (data, arr) {
-  const obj = {};
-  arr.forEach(key => {
-    if (data[key] !== undefined) obj[key] = data[key];
-  });
-  return obj;
+exports.filterParams = function(data, arr) {
+    const obj = {};
+    arr.forEach(key => {
+        if (data[key] !== undefined) obj[key] = data[key];
+    });
+    return obj;
 };
+
+/**
+ * 判断是否为generator
+ * @param {*} v 
+ */
+exports.isGenerator = (v) => {
+    return typeof v === 'function' && v.constructor.name === 'GeneratorFunction';
+}
