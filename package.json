@@ -1,7 +1,7 @@
 {
-  "name": "api-framework",
+  "name": "wuziqi",
   "version": "1.0.0",
-  "description": "APP Framework",
+  "description": "五子棋开源项目",
   "main": "src/index.js",
   "scripts": {
     "start": "export NODE_ENV=production && node src/index.js",
@@ -17,7 +17,7 @@
     "publicDoc": "cd docs && git pull && git add . && git commit -m 'update doc' && git push",
     "logs": "tail -F ./logs/**/*.log"
   },
-  "author": "Yourtion <yourtion@gmail.com>",
+  "author": "xiaod <1181049225@qq.com>",
   "license": "ISC",
   "dependencies": {
     "bluebird": "^3.5.1",
