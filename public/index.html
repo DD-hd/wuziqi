@@ -1,53 +1,63 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>五子棋</title>
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
-    <link rel="shortcut icon" href="/favicon.ico">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
-    <link rel="stylesheet" href="./libs/jquery-weui/lib/weui.min.css?r=20160316">
-    <link rel="stylesheet" href="./libs/jquery-weui/css/jquery-weui.css">
-    <link rel="stylesheet" href="./css/main.css">
-</head>
+    <link
+      rel="stylesheet"
+      href="./libs/jquery-weui/lib/weui.min.css?r=20160316"
+    />
+    <link rel="stylesheet" href="./libs/jquery-weui/css/jquery-weui.css" />
+    <link rel="stylesheet" href="./css/main.css" />
+  </head>
 
-<body ontouchstart>
+  <body ontouchstart>
     <h1>五子棋</h1>
     <p>五子连珠，劳逸结合 - 任我行</p>
 
     <div class="board-outer">
-        <div class="board" id="board">
-        </div>
+      <div class="board" id="board"></div>
     </div>
 
-    <div class="status">
-    </div>
+    <div class="status"></div>
 
     <div class="buttons">
-        <div class="weui-row">
-            <div class="weui-col-33">
-                <a href="javascript:;" class="weui_btn weui_btn_primary" id='start'>开始</a>
-            </div>
-            <div class="weui-col-33">
-                <a href="javascript:;" class="weui_btn weui_btn_warn" id='fail'>认输</a>
-            </div>
-            <div class="weui-col-33">
-                <a href="javascript:;" class="weui_btn weui_btn_default" id='back'>悔棋</a>
-            </div>
+      <div class="weui-row">
+        <div class="weui-col-33">
+          <a href="javascript:;" class="weui_btn weui_btn_primary" id="start"
+            >开始</a
+          >
         </div>
+        <div class="weui-col-33">
+          <a href="javascript:;" class="weui_btn weui_btn_warn" id="fail"
+            >认输</a
+          >
+        </div>
+        <div class="weui-col-33">
+          <a href="javascript:;" class="weui_btn weui_btn_default" id="back"
+            >悔棋</a
+          >
+        </div>
+      </div>
     </div>
-    <script src='./libs/jquery-weui/lib/jquery-2.1.4.js'></script>
-    <script src='./libs/jquery-weui/js/jquery-weui.js'></script>
+    <script>
+      var $config = {
+        domain: "47.106.201.148:8001"
+      };
+    </script>
+    <script src="./libs/jquery-weui/lib/jquery-2.1.4.js"></script>
+    <script src="./libs/jquery-weui/js/jquery-weui.js"></script>
     <script src="./js/event.js"></script>
     <script src="./libs/socket.io.js"></script>
-    <script src='./js/score.js'></script>
-    <script src='./js/role.js'></script>
-    <script src='./js/win.js'></script>
-    <script src='./js/main.js'></script>
-</body>
-
+    <script src="./js/score.js"></script>
+    <script src="./js/role.js"></script>
+    <script src="./js/win.js"></script>
+    <script src="./js/main.js"></script>
+  </body>
 </html>
